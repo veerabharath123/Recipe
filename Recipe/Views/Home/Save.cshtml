@@ -17,44 +17,94 @@
                 </button>
             </div>
         </div>
-        <form action="@Url.Action("SaveRecipe","Home")">
-            <div class="row">
-                <div class="col-12">
-                    @Html.HiddenFor(x => x.ID,new {@class="form-control"})
-                    <div class="mb-3 mt-3">
-                        <label for="email" class="form-label">Recipe Name:</label>
-                        @Html.TextBoxFor(x => x.RECIPE_NAME,new {@class="form-control"})
+        <div class="row">
+            <div class="col-4 shadow d-center">
+                <div style="" class="d-center border pic">
+                    <div class="img-edit-bg r-center">
+                        <button class="btn btn-info" id="upload">
+                            <i class="fa fa-edit"></i>
+                        </button>
                     </div>
-                    <div class="mb-3">
-                        <label for="pwd" class="form-label">Steps:</label>
-                        @Html.TextAreaFor(x => x.DESCRIPTION,new {@class="form-control",@rows="10"})
-                    </div>
-                    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                            <div class="modal-content partial">
-                                @Html.PartialAsync("IngredientPartial", Model.Ingredients)
+                    @if(Model.ID > 0 && !string.IsNullOrEmpty(Model.Image))
+                    {
+                        <img id="img-pic" src="@("data:image/jpeg;base64,"+Model.Image)" style="width:100%;height:100%" />
+                    }
+                    else
+                    {
+                        <img id="img-pic" src="https://i.pinimg.com/474x/59/5f/a5/595fa5ffb3d67f62ceabaa0d9a40d1e2.jpg" style="width:100%;height:100%" />
+                    }
+                    <input type="file" id="browse" hidden/>
+                </div>
+            </div>
+            <div class="col-8">
+                <form action="@Url.Action("SaveRecipe","Home")">
+                    <div class="row">
+                        <div class="col-12">
+                            @Html.HiddenFor(x => x.IMAGE_ID,new {@class="form-control",@id="temp_id"})
+                            @Html.HiddenFor(x => x.ID,new {@class="form-control"})
+                            <div class="mb-3 mt-3">
+                                <label for="email" class="form-label">Recipe Name:</label>
+                                @Html.TextBoxFor(x => x.RECIPE_NAME,new {@class="form-control"})
+                            </div>
+                            <div class="mb-3">
+                                <label for="pwd" class="form-label">Steps:</label>
+                                @Html.TextAreaFor(x => x.DESCRIPTION,new {@class="form-control",@rows="10"})
+                            </div>
+                            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                    <div class="modal-content partial">
+                                        @Html.Partial("IngredientPartial", Model.Ingredients)
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            @if(Model.ID > 0)
+                            {
+                                <button data-id="@Model.ID" class="btn btn-danger" type="button" id="delrecipe">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </form>
             </div>
-            <div class="row">
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    @if(Model.ID > 0)
-                    {
-                        <button data-id="@Model.ID" class="btn btn-danger" type="button" id="delrecipe">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    }
-                </div>
-            </div>
-        </form>
+        </div>
+        
     </div>
     
 </div>
 
 <script>
+    $(document).on('click','#upload',() => $('#browse').click())
+    $(document).on('change','#browse',function(e){
+        let file = this.files[0];
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function () {
+            $.ajax({
+                url:'@Url.Action("SaveImage","Home")',
+                data:{Image_Name:file.name,Image_Type:file.type,Base64:reader.result},
+                type:'POST',
+                success:function(res){
+                    if(res['success']){
+                        $('#img-pic').attr('src',URL.createObjectURL(file))
+                        $('#temp_id').val(res['result'])
+                    }
+                    else alert(res['message'])
+                },
+                error:()=>alert('Failed')
+            })
+        };
+        reader.onerror = function (error) {
+            console.log('Error: ', error);
+        };
+
+        
+    })
     $(document).on('click', '#delbtn', function () {
         if ($('.partial .ing').length > 1) {
             let ing = $('.partial .ing:last');
@@ -84,7 +134,7 @@
         $('.ing').each((i, e) =>
             data.push({
                 INGREDIENT_NAME: $(e).find('input.Name').val(),
-                QUANTITY: $(e).find('input.Name').val(),
+                QUANTITY: $(e).find('input.Quantity').val(),
                 RECIPE_ID: $(e).find('input.recipe_id').val(),
                 ID: $(e).find('input.id').val(),
             })
@@ -109,6 +159,7 @@
     }
     $(document).on('click', '#addbtn', addIngredient)
     $(document).on('click', '.show-ing', function () {
+        debugger
         if ($('.partial .ing').length == 0) 
             addIngredient()
     })

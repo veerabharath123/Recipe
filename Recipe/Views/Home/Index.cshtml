@@ -69,7 +69,12 @@
                     @foreach (var item in Model)
                     {
                         <div class="col-md-2 col-6">
+                            
                             <div class="img-h img-block shadow my-2 rounded bg-light">
+                                @if(item.ID > 0 && !string.IsNullOrEmpty(item.Image))
+                                {
+                                    <img id="img-pic" src="@("data:image/jpeg;base64,"+item.Image)" style="width:100%;height:100%;position:absolute" />
+                                }
                                 <div class="img-bg d-around">
                                     <a class="no-decor" href="@Url.Action("Details","Home",new {id=item.ID})">
                                         <i class="fa-solid fa-edit text-light"></i>

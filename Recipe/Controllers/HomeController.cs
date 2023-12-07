@@ -95,5 +95,10 @@ namespace Recipe.Controllers
             var response = await _request.ApiCallPost<List<RecipeDetails>>("Food", "GetFavourites", null);
             return View("Index", response.Result);
         }
+        public async Task<IActionResult> SaveImage(ImageDetails imgDetails)
+        {
+            var response = await _request.ApiCallPost<Guid?>("Documents", "SaveImage", imgDetails);
+            return Json(response);
+        }
     }
 }

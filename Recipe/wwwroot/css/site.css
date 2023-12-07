@@ -53,6 +53,10 @@ body {
     justify-content: end;
     align-items: center;
 }
+.r-center {
+    justify-content: center;
+    align-items: center;
+}
 .r-start {
     justify-content: start;
     align-items: center;
@@ -129,3 +133,17 @@ body {
 .img-block:hover > .img-bg{
     transform: translateY(0%);
 }
+.img-edit-bg {
+    width: 100%;
+    height: 100%;
+    display: none;
+    background: #000000a6;
+    position:absolute;
+}
+.pic {
+    aspect-ratio: 1/1;
+    position: relative
+}
+    .pic:hover > .img-edit-bg {
+        display: flex;
+    }

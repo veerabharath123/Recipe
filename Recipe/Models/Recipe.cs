@@ -11,5 +11,6 @@ namespace Recipe.Models
         [Required]
         public string? DESCRIPTION { get; set; } = string.Empty;
         public string? FAVOURITES { get; set; }
+        public Guid? IMAGE_ID { get; set; }
     }
 }
