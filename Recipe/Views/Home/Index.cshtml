@@ -3,7 +3,7 @@
     ViewData["Title"] = "Recipe";
 }
 
-<div class="container">
+<div class="container" style="z-index:-2">
     <div class="container mt-3">
         <h3>Your Recipes</h3>
         <hr />
@@ -68,7 +68,7 @@
                 <div class="row r-start">
                     @foreach (var item in Model)
                     {
-                        <div class="col-md-2 col-6">
+                        <div class="col-md-3 col-6">
                             
                             <div class="img-h img-block shadow my-2 rounded bg-light">
                                 @if(item.ID > 0 && !string.IsNullOrEmpty(item.Image))
@@ -84,9 +84,9 @@
                                     </a>
                                     
                                 </div>
-                                <div class="img-h img-content m-2">
-                                        <div class="d-flex">
-                                            <div class="col-10 o-x-h"> @item.RECIPE_NAME</div>
+                                <div class="img-h img-content ">
+                                        <div class="d-flex m-2" >
+                                            <div class="col-10 o-x-h " style="mix-blend-mode: difference;color: whitesmoke;"> @item.RECIPE_NAME</div>
                                             <div class="col-2">
                                                 <span data-id="@item.ID" class="Favourite" title="Favourite">
                                                     @if (item.FAVOURITES == "Y")

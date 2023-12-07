@@ -96,7 +96,7 @@
                     }
                     else alert(res['message'])
                 },
-                error:()=>alert('Failed')
+                error:function(err){alert(err)}
             })
         };
         reader.onerror = function (error) {
