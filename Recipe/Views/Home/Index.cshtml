@@ -1,0 +1,136 @@
+﻿@model List<RecipeDetails>
+@{
+    ViewData["Title"] = "Recipe";
+}
+
+<div class="container">
+    <div class="container mt-3">
+        <h3>Your Recipes</h3>
+        <hr />
+        <div class="row mt-3 mb-3">
+            <div class="col-6 d-start">
+                <a class="btn btn-primary" href="@Url.Action("Details","Home")">
+                    <i class="fa-solid fa-plus"></i>
+                </a>
+            </div>
+            <div class="col-6 d-end">
+                <div class="btn-group change-view-buttons shadow">
+                    <button class="btn btn-primary change-view" data-view="table-view" title="List view">
+                        <i class="fa fa-list"></i>
+                    </button>
+                    <button class="btn btn-secondary change-view" data-view="block-view" title="Grid view">
+                        <i class="fa fa-grip"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3 view">
+            <div class="col-12 h-50 table-view">
+                <table class="table table-striped">
+                    <tr>
+                        <th></th>
+                        <th>Recipe Name</th>
+                        <th>No of Ingredients</th>
+                        
+                    </tr>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            
+                            <td class="options">
+                                
+                                <a href="@Url.Action("View","Home",new {id=item.ID})" class="" title="View">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                                <a href="@Url.Action("Details","Home",new {id=item.ID})" class="text-warning" title="Edit">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                                <span data-id="@item.ID" class="Favourite" title="Favourite">
+                                    @if (item.FAVOURITES == "Y")
+                                    {
+                                        <i class="fa-solid c-pink fa-heart"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="fa-regular fa-heart"></i>
+                                    }
+                                </span>
+                            </td>
+                            <td>@item.RECIPE_NAME</td>
+                            <td>@item.TotalIngredients</td>
+
+                        </tr>
+                    }
+                </table>
+            </div>
+            <div class="col-12 h-50 block-view d-none">
+                <div class="row r-start">
+                    @foreach (var item in Model)
+                    {
+                        <div class="col-md-2 col-6">
+                            <div class="img-h img-block shadow my-2 rounded bg-light">
+                                <div class="img-bg d-around">
+                                    <a class="no-decor" href="@Url.Action("Details","Home",new {id=item.ID})">
+                                        <i class="fa-solid fa-edit text-light"></i>
+                                    </a>
+                                     <a class="no-decor" href="@Url.Action("View","Home",new {id=item.ID})">
+                                        <i class="fa-solid fa-eye text-light"></i>
+                                    </a>
+                                    
+                                </div>
+                                <div class="img-h img-content m-2">
+                                        <div class="d-flex">
+                                            <div class="col-10 o-x-h"> @item.RECIPE_NAME</div>
+                                            <div class="col-2">
+                                                <span data-id="@item.ID" class="Favourite" title="Favourite">
+                                                    @if (item.FAVOURITES == "Y")
+                                                    {
+                                                        <i class="fa-solid c-pink fa-heart"></i>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="fa-regular fa-heart"></i>
+                                                    }
+                                                </span>
+                                            </div>
+                                        </div>
+                                   
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>   
+    <script>
+        $(document).on('click','button.change-view.btn-secondary',function(){
+            $('.change-view').toggleClass('btn-primary btn-secondary')
+            $('.view > .col-12').toggleClass('d-none')
+        })
+        $('.Favourite').on('click',function(){
+            let ele = $(this);
+            let btn = ele.find('i')
+            $.ajax({
+                url:'@Url.Action("ChangeFav","Home")',
+                type:'POST',
+                data: { id: ele.data('id'), change: btn.hasClass('fa-regular') },
+                success:function(res){
+                    if(res['success'] == true){
+                        btn.hasClass('fa-regular') ?
+                        btn.removeClass('fa-regular').addClass('fa-solid c-pink') :
+                            btn.removeClass('fa-solid c-pink').addClass('fa-regular')
+                    }
+                    else{
+                        alert(res['message'])
+                    }
+                },
+                error:function(){
+                    alert("Failed")
+                }
+            })
+        })
+    </script>
+</div>
+

@@ -1,0 +1,57 @@
+﻿@model RecipeDetails
+@{
+    ViewData["Title"] = $"View recipe";
+}
+<div class="container">
+    <div class="container mt-2 mb-2">
+        <h3>View Recipe</h3>
+        <hr />
+        <div class="row mt-3 mb-3">
+            <h5>Recipe Name:</h5>
+            <div class="col-12">
+                @Html.TextBoxFor(x => x.RECIPE_NAME,new{@class="form-control",@disabled=true})
+            </div>
+        </div>
+        <div class="row mt-3 mb-3">
+            <div class="col-lg-8 ">
+                <div class="row">
+                    <div class="col-12 bg-dark">
+                        <h5>Instructions:</h5>
+                    </div>
+                    <div class="col-12 scroll bg-light">
+                        <ol>
+                            @foreach (var item in (Model.DESCRIPTION ?? string.Empty).Split(new string[] { Environment.NewLine },
+                            StringSplitOptions.None))
+                            {
+                                <li>@item</li>
+                            }
+                        </ol>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="row">
+                    <div class="col-12 bg-dark">
+                        <h5>Ingredietns:</h5>
+                    </div>
+                    <div class="col-12 scroll bg-light">
+                        <table class="table table-striped ">
+                            <tr>
+                                <th>Name</th>
+                                <th>Quantity</th>
+                            </tr>
+                            @foreach (var item in Model.Ingredients)
+                            {
+                                <tr>
+                                    <td>@item.INGREDIENT_NAME</td>
+                                    <td>@item.QUANTITY</td>
+                                </tr>
+                            }
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
