@@ -2,9 +2,13 @@
 @{
     ViewData["Title"] = $"View recipe";
 }
-<div class="container">
-    <div class="container mt-2 mb-2">
-        <h3>View Recipe</h3>
+<div class="container-fluid">
+    <div class="container-fluid mt-3 mb-2 rounded shadow">
+        <h3>
+            <a class="no-decor" href="@Url.Action("Index","Home")">
+                <i class="fas fa-arrow-left text-dark"></i>
+            </a>View Recipe
+        </h3>
         <hr />
         <div class="row mt-3 mb-3">
             <h5>Recipe Name:</h5>
@@ -13,12 +17,24 @@
             </div>
         </div>
         <div class="row mt-3 mb-3">
-            <div class="col-lg-8 ">
+            <div class="col-lg-4 blur border border-warning " style="box-shadow:0px 0px 10px 2px inset #00000069">
+                <div style="" class="d-center pic rounded o-x-h ">
+                    @if(Model.ID > 0 && !string.IsNullOrEmpty(Model.Image))
+                    {
+                        <img id="img-pic " src="@("data:image/jpeg;base64,"+Model.Image)" style="width:80%;height:80%" />
+                    }
+                    else
+                    {
+                        <img id="img-pic" src="https://i.pinimg.com/474x/59/5f/a5/595fa5ffb3d67f62ceabaa0d9a40d1e2.jpg" style="width:80%;height:80%" />
+                    }
+                </div>
+            </div>
+            <div class="col-lg-4 border border-warning">
                 <div class="row">
-                    <div class="col-12 bg-dark">
-                        <h5>Instructions:</h5>
+                    <div class="col-12 dark-accent">
+                        <h5><i class="fa fa-list"></i> Instructions:</h5>
                     </div>
-                    <div class="col-12 scroll bg-light">
+                    <div class="col-12 scroll blur white-accent" style="box-shadow:0px 0px 10px 2px inset #00000069">
                         <ol>
                             @foreach (var item in (Model.DESCRIPTION ?? string.Empty).Split(new string[] { Environment.NewLine },
                             StringSplitOptions.None))
@@ -29,13 +45,14 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4">
+            <div class="col-lg-4 border border-warning  ">
                 <div class="row">
-                    <div class="col-12 bg-dark">
+                    <div class="col-12 dark-accent">
                         <h5>Ingredietns:</h5>
                     </div>
-                    <div class="col-12 scroll bg-light">
-                        <table class="table table-striped ">
+                    <div class="col-12 scroll blur white-accent" style="box-shadow:0px 0px 10px 2px inset #00000069">
+                        <table class="table table-striped text-center">
+                            <tbody>
                             <tr>
                                 <th>Name</th>
                                 <th>Quantity</th>
@@ -47,7 +64,7 @@
                                     <td>@item.QUANTITY</td>
                                 </tr>
                             }
-
+                            </tbody>
                         </table>
                     </div>
                 </div>

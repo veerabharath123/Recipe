@@ -92,6 +92,7 @@ namespace Recipe.Controllers
         }
         public async Task<IActionResult> Favourites()
         {
+            ViewData["Favourites"] = "Y";
             var response = await _request.ApiCallPost<List<RecipeDetails>>("Food", "GetFavourites", null);
             return View("Index", response.Result);
         }
