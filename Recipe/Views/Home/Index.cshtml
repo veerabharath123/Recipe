@@ -86,7 +86,11 @@
                                 </div>
                                 <div class="img-h img-content ">
                                         <div class="d-flex m-2" >
-                                            <div class="col-10 o-x-h " style="mix-blend-mode: difference;color: whitesmoke;"> @item.RECIPE_NAME</div>
+                                            <div class="col-10 o-x-h " >
+                                                <a class="no-decor text-white" href="@Url.Action("View","Home",new {id=item.ID})">
+                                                    @item.RECIPE_NAME
+                                                </a>
+                                            </div>
                                             <div class="col-2">
                                                 <span data-id="@item.ID" class="Favourite" title="Favourite">
                                                     @if (item.FAVOURITES == "Y")

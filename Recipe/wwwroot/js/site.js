@@ -1,8 +1,10 @@
 ﻿function spinner(flag) {
     if (flag) {
-        $('.spinner-bg').removeClass('d-none')
+        $('.spinner-bg').removeClass('d-none').addClass('d-center')
     }
     else {
-        $('.spinner-bg').removeClass('d-none').addClass('d-none')
+        setTimeout(() => {
+            $('.spinner-bg').removeClass('d-none d-center').addClass('d-none')
+        },2000)
     }
 }

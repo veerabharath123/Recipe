@@ -85,18 +85,20 @@
         let reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = function () {
+            spinner(true)
             $.ajax({
                 url:'@Url.Action("SaveImage","Home")',
-                data:{Image_Name:file.name,Image_Type:file.type,Base64:reader.result},
+                data: { Image_Name: file.name, Image_Type: file.type, Base64: reader.result?.replace('data:image/jpeg;base64,', ''), Temp_Id: $('#temp_id').val() },
                 type:'POST',
                 success:function(res){
+                    spinner(false)
                     if(res['success']){
                         $('#img-pic').attr('src',URL.createObjectURL(file))
                         $('#temp_id').val(res['result'])
                     }
                     else alert(res['message'])
                 },
-                error:function(err){alert(err)}
+                error: function (err) { alert(err); spinner(false) }
             })
         };
         reader.onerror = function (error) {
