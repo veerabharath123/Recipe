@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Newtonsoft.Json;
 using Recipe.Helpers;
 using Recipe.Models;
 using System.Net.NetworkInformation;
+using Microsoft.AspNetCore;
 
 namespace Recipe.Controllers
 {
@@ -17,7 +19,12 @@ namespace Recipe.Controllers
         [ResponseCache(NoStore = true)]
         public async Task<IActionResult> Index()
         {
-            var data = await _request.ApiCallPost<List<RecipeDetails>>("Food", "GetRecipeList", null);
+            ViewData["section"] = "Index";
+            var request = new PagerRequest();
+            var session = HttpContext.Session.GetString("PagerRequest");
+            if(session != null) request = JsonConvert.DeserializeObject<PagerRequest>(session);
+            var data = await _request.ApiCallPost<PagerResponse<RecipeDetails>>("Food", "GetRecipeList", request);
+            if (data.Result != null) data.Result.VIEW = request.view;
             return View(data.Result);
         }
         public async Task<IActionResult> Details(decimal? id)
@@ -90,16 +97,25 @@ namespace Recipe.Controllers
             }
             return Json(new {sucess=false,message="failed"});
         }
-        public async Task<IActionResult> Favourites()
+        public async Task<IActionResult> Favourites(PagerRequest request)
         {
-            ViewData["Favourites"] = "Y";
-            var response = await _request.ApiCallPost<List<RecipeDetails>>("Food", "GetFavourites", null);
+            ViewData["section"] = "Favourites";
+            HttpContext.Session.SetString("PagerRequest", JsonConvert.SerializeObject(request));
+            var response = await _request.ApiCallPost<PagerResponse<RecipeDetails>>("Food", "GetFavourites", new PagerRequest());
+            if (response.Result != null) response.Result.VIEW = request.view;
             return View("Index", response.Result);
         }
         public async Task<IActionResult> SaveImage(ImageDetails imgDetails)
         {
             var response = await _request.ApiCallPost<Guid?>("Documents", "SaveImage", imgDetails);
             return Json(response);
+        }
+        public async Task<IActionResult> LoadPages(PagerRequest request)
+        {
+            HttpContext.Session.SetString("PagerRequest", JsonConvert.SerializeObject(request));
+            var response = await _request.ApiCallPost<PagerResponse<RecipeDetails>>("Food", "GetRecipeList", request);
+            if(response.Result != null) response.Result.VIEW = request.view;
+            return PartialView("Pages",response.Result);
         }
     }
 }

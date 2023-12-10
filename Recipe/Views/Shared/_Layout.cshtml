@@ -24,9 +24,22 @@
             <div class="navbar navbar-expand-sm bg-dark nav-bg">
                 <div class="container-fluid">
                     <a class="navbar-brand text-white d-center"><h1> Recipes<i class="fa-solid fa-utensils"></i></h1></a>
-                    <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
+                    <div class="navbar-toggler text-white" >
+                        <button class="btn-icon text-white" type="button" data-bs-toggle="collapse" data-bs-target="#collapsibleNavbar">
+                            <i class="fa-solid fa-bars"></i>
+                        </button>
+                        <div class="dropdown dropstart d-inline-block">
+                            <button class="btn-icon text-white " type="button" data-bs-toggle="dropdown">
+                                <i class="fa-solid fa-circle-user"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><h5 class="dropdown-header">Profile</h5></li>
+                                <li><span class="dropdown-item-text" href="#">User 1</span></li>
+                                <li><hr class="dropdown-divider"></hr></li>
+                                <li><a class="dropdown-item" href="#">Logout</a></li>
+                            </ul>
+                        </div>
+                    </div>
                     <div class="collapse navbar-collapse" id="collapsibleNavbar">
                         <ul class="navbar-nav">
                             <li class="nav-item">
@@ -43,11 +56,19 @@
                             </li>
                         </ul>
                     </div>
-                </div>
-
-                <div class="d-starts mx-3 w-100">
-                    
-                    
+                    <div class="d-none d-sm-inline text-white">
+                        <div class="dropdown dropstart d-center">
+                            
+                            <button class="btn-icon text-white " type="button" data-bs-toggle="dropdown">
+                                <i class="fa-solid fa-circle-user"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li><h5 class="dropdown-header">User 1</h5></li>
+                                <li><hr class="dropdown-divider"></hr></li>
+                                <li><a class="dropdown-item" href="#"><i class="fa-solid fa-right-from-bracket"></i> Logout </a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
             @RenderBody()

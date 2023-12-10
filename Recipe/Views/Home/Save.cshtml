@@ -5,8 +5,7 @@
     foodtypes.Add(new RecipeType{RECIPETYPE_NAME="Veg",ID = 1});
     foodtypes.Add(new RecipeType{RECIPETYPE_NAME="Non-Veg",ID = 2});
 }
-<div class="container-fluid w-100 ">
-    <div class="container-fluid h-fit rounded shadow-lg w-100">
+<div class="c-box rounded shadow-lg " style="z-index:-2">
         <h3 class="mt-3">
             <a class="no-decor" href="@Url.Action("Index","Home")">
                 <i class="fas fa-arrow-left text-dark"></i>
@@ -21,7 +20,7 @@
             </div>
         </div>
         <div class="row mb-5">
-            <div class="col-4 d-center blur">
+            <div class="col-lg-4 d-center blur">
                 <div style="" class="d-center border pic rounded o-x-h">
                     <div class="img-edit-bg r-center">
                         <button class="btn btn-info" id="upload">
@@ -39,7 +38,7 @@
                     <input type="file" id="browse" hidden/>
                 </div>
             </div>
-            <div class="col-8 ">
+            <div class="col-lg-8 ">
                 <form action="@Url.Action("SaveRecipe","Home")">
                     <div class="row">
                         <div class="col-12">
@@ -71,21 +70,13 @@
                                                     <span>@item.RECIPETYPE_NAME</span>
                                                 </div>
                                             }
-                                            
-                                            
                                         </div>
-
-                                        
-                                        
-                                        
-                                        
-                                        
                                     </div>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label for="pwd" class="form-label">Steps:</label>
-                                @Html.TextAreaFor(x => x.DESCRIPTION,new {@class="form-control",@rows="10"})
+                                @Html.TextAreaFor(x => x.DESCRIPTION,new {@class="form-control",@rows="5"})
                             </div>
                             <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -112,7 +103,6 @@
         </div>
     </div>
     
-</div>
 
 <script>
     $(document).on('click','#upload',() => $('#browse').click())
