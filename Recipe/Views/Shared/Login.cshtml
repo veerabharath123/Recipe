@@ -1,0 +1,101 @@
+﻿@{
+    Layout = "_LayoutLogin";
+    var sigin = (bool)ViewData["signin"];
+}
+<div class="c-box-2 rounded shadow-lg d-center scroll" style="z-index:-2">
+    <div class="row deep-shadow rounded" style="height:80%;width:clamp(480px,50%,98%)">
+        <div class="col-lg-6 blur">
+            <div class="row w-100" style="position:absolute">
+                <h1 class="mt-3">@(sigin ? "Sign Up" : "Sign In")</h1>
+                <form action="@Url.Action("VerifyUser","Login")" method="POST" id="form1">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="mb-2 mt-2">
+                                <label for="email" class="form-label">Email:</label>
+                                <input type="email" name="email" class="form-control" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="mb-2 mt-2">
+                            <label for="password" class="form-label">Password:</label>
+                            <input type="text" id="pass" name="password" class="form-control"/>
+                        </div>
+                    </div>
+                    @if (sigin)
+                    {
+                        <div class="row">
+                            <div class="mb-2 mt-2">
+                                <label for="password" class="form-label">Confirm Password:</label>
+                                <input type="text" class="form-control"/>
+                            </div>
+                        </div>
+                    }
+                    <div class="row mt-2 mb-2">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary" id="submit">Login</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            @if (!sigin)
+            {
+                <div class="row " style="position:absolute;bottom:20px;">
+                    <a href="#" class="text-dark"><i class="fa-solid fa-key"></i> forget password </a>
+                </div>
+            }
+            
+        </div>
+        <div class="col-lg-6 d-none d-lg-inline-block @(sigin ? "bg-primary":"bg-success") " style="position:relative">
+            <div class="row mt-3" style="position:absolute">
+                <div clss="col-12 ">
+                    <h3 class="text-white mx-4">
+                        @(!sigin ? "Cooking is an Art, bring out the foodie in you!":"Everyone is a hidden chef, Awaken your inner chef!")
+                        
+                    </h3>
+                </div>
+            </div>
+            <div style="position:absolute" class="row d-center w-100 h-100">
+                @if(sigin){
+
+    <dotlottie-player src="https://lottie.host/cd627fc9-39d9-46e9-bbf4-2f88c5e3086a/FAWRJy2U2F.json" background="transparent" speed="0.5" style="width: 300px; height: 300px;" loop autoplay></dotlottie-player>
+                }
+                else
+                {
+
+
+    <dotlottie-player src="https://lottie.host/3431bfdb-8097-4bc2-a62b-840d8f980797/pWPgNNyOgt.json" background="transparent" speed="1" style="width: 300px; height: 300px;" loop autoplay></dotlottie-player>
+                }
+            </div>
+            <div style="position:absolute;bottom:30px;" class="row d-center w-100">
+                <div class="col-12 d-center">
+                    <a href="@Url.Action("Login","Login",new{signin=!sigin})" class="btn btn-dark rounded deep-shadow">
+                        @(!sigin ? "Sign Up" : "Sign In")
+                    </a>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+<script>
+    var value1 = '!MmU$er@ct0Nline'
+    var value2 = '!MmU$er@ct0Nline'
+    function GetValuesFrom(value1, value2)
+    {
+        $("#submit").click(function () {
+            var key = CryptoJS.enc.Utf8.parse(value1);
+            var iv = CryptoJS.enc.Utf8.parse(value2);
+            var value = $("#pass").val();
+            var encryptedlogin = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(value), key,
+              {
+                  keySize: 128 / 8,
+                  iv: iv,
+                  mode: CryptoJS.mode.CBC,
+                  padding: CryptoJS.pad.Pkcs7
+              });
+              $("#pass").val(encryptedlogin)
+        });
+    }
+    GetValuesFrom(value1, value2)
+</script>

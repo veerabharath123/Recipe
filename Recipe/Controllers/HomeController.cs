@@ -25,7 +25,7 @@ namespace Recipe.Controllers
             if(session != null) request = JsonConvert.DeserializeObject<PagerRequest>(session);
             var data = await _request.ApiCallPost<PagerResponse<RecipeDetails>>("Food", "GetRecipeList", request);
             if (data.Result != null) data.Result.VIEW = request.view;
-            return View(data.Result);
+            return View("Login");
         }
         public async Task<IActionResult> Details(decimal? id)
         {
