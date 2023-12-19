@@ -42,10 +42,9 @@ namespace Recipe.Controllers
             if (ModelState.IsValid)
             {
                 var data = await _request.ApiCallPost<bool>("Food", "SaveRecipe", request);
-                if (data.Result)
-                    return RedirectToAction("Index");
+                return Json(data);
             }
-            return View("Save", request);
+            return Json(new { sucess = false, message = "failed" });
         }
         public IActionResult LoadIngredients(string data)
         {

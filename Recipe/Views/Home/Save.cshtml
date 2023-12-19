@@ -36,10 +36,11 @@
                         <img id="img-pic" src="https://i.pinimg.com/474x/59/5f/a5/595fa5ffb3d67f62ceabaa0d9a40d1e2.jpg" style="width:100%;height:100%" />
                     }
                     <input type="file" id="browse" hidden/>
+                    
                 </div>
             </div>
             <div class="col-lg-8 ">
-                <form action="@Url.Action("SaveRecipe","Home")">
+                <form  method="POST" id="form1">
                     <div class="row">
                         <div class="col-12">
                             @Html.HiddenFor(x => x.IMAGE_ID,new {@class="form-control",@id="temp_id"})
@@ -89,7 +90,7 @@
                     </div>
                     <div class="row mb-2">
                         <div class="col-12">
-                            <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-primary " id="submit">Submit</button>
                             @if(Model.ID > 0)
                             {
                                 <button data-id="@Model.ID" class="btn btn-danger" type="button" id="delrecipe">
@@ -105,58 +106,83 @@
     
 
 <script>
-    $(document).on('click','#upload',() => $('#browse').click())
-    $(document).on('change','#browse',function(e){
+    function validateForm() {
+        return {errors:0,message=''}
+    }
+    $('#submit').click(function () {
+        var err = validateForm();
+        if (err.errors > 0) notifyBar(err.message, 'danger');
+        else ajaxPost(
+            '', '@Url.Action("SaveRecipe","Home")',
+            $('#form1').serialize(),
+            function (res) {
+                if (res['success'] && res['result']) {
+                    notifyBar(res['message'], 'success', function () {
+                        window.location.href = '@Url.Action("Index","Home")'
+                    }, 2500)
+                }
+                else alert(res['message']);
+            }, { toggle: true }
+        );
+    });
+    $(document).on('click', '#upload', () => $('#browse').click());
+    $(document).on('change', '#browse', function (e) {
         let file = this.files[0];
         let reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = function () {
-            spinner(true)
-            $.ajax({
-                url:'@Url.Action("SaveImage","Home")',
-                data: { Image_Name: file.name, Image_Type: file.type, Base64: reader.result?.replace('data:image/jpeg;base64,', ''), Temp_Id: $('#temp_id').val() },
-                type:'POST',
-                success:function(res){
-                    spinner(false)
-                    if(res['success']){
-                        $('#img-pic').attr('src',URL.createObjectURL(file))
-                        $('#temp_id').val(res['result'])
+            ajaxPost(
+                '', '@Url.Action("SaveImage","Home")',
+                { Base64: reader.result?.replace('data:' + file.type + ';base64,', ''), Temp_Id: $('#temp_id').val(), Image_Name: file.name, Image_Type: file.type },
+                function (res) {
+                    if (res['success']) {
+                        $('#img-pic').attr('src', URL.createObjectURL(file));
+                        $('#img-pic-h').val(reader.result?.replace('data:' + file.type + ';base64,', ''));
+                        $('#temp_id').val(res['result']);
+                        notifyBar(res['message'], 'success');
                     }
-                    else alert(res['message'])
+                    else notifyBar(res['message'], 'danger');
                 },
-                error: function (err) { alert(err); spinner(false) }
-            })
+                { toggle: true }
+            );
         };
         reader.onerror = function (error) {
             console.log('Error: ', error);
         };
-
-        
-    })
+    });
     $(document).on('click', '#delbtn', function () {
         if ($('.partial .ing').length > 1) {
-            let ing = $('.partial .ing:last');
-            $('.partial .ing:last').remove()
+            let ingId = $('.partial .ing:last').find('input.id').val();
+            if (['', '0'].indexOf(ingId) > -1) delIng(ingId);
+            else $('.partial .ing:last').remove();
         }
-        if ($('.partial .ing').length == 1)
-            $(this).remove()
-                   
-    })
-    $(document).on('click', '#delrecipe', function () { 
-        $.ajax({
-            url: '@Url.Action("DeleteRecipe","Home")',
-            data: { id: $(this).data('id') },
-            type: 'POST',
-            success: function (res) {
+        if ($('.partial .ing').length == 1) $(this).remove();
+    });
+    function delIng(id = 0) {
+        ajaxPost(
+            '', '@Url.Action("DeleteIngredient","Home")', { id: id },
+            function (res) {
                 if (res['success'] == true) {
-                    alert(res['message']);
-                    window.location.href = '@Url.Action("Index","Home")'
+                    $('.partial .ing:last').remove();
+                    notifyBar(res['message'], 'success');
                 }
                 else alert(res['message']);
-            },
-            error: function () { alert("Operation failed") }
-        })
-    })
+            }, { toggle: true }
+        );
+    }
+    $(document).on('click', '#delrecipe', function () {
+        ajaxPost(
+            '', '@Url.Action("DeleteRecipe","Home")', { id: $(this).data('id') },
+            function (res) {
+                if (res['success'] == true) {
+                    notifyBar(res['message'], 'success', function () {
+                        window.location.href = '@Url.Action("Index","Home")'
+                    })
+                }
+                else alert(res['message']);
+            }, { toggle: true }
+        );
+    });
     function addIngredient(){
         let data = [];
         $('.ing').each((i, e) =>
@@ -166,29 +192,19 @@
                 RECIPE_ID: $(e).find('input.recipe_id').val(),
                 ID: $(e).find('input.id').val(),
             })
-        )
-        data.push({
-            INGREDIENT_NAME: '',
-            QUANTITY: '',
-            RECIPE_ID: 0,
-            ID: 0,
-        })
-        $.ajax({
-            url: '@Url.Action("LoadIngredients","Home")',
-            type: 'POST',
-            data: { data: JSON.stringify(data) },
-            success: function (res) {
+        );
+        data.push({ INGREDIENT_NAME: '', QUANTITY: '', RECIPE_ID: 0, ID: 0, });
+        ajaxPost(
+            '', '@Url.Action("LoadIngredients","Home")', { data: JSON.stringify(data) },
+            function (res) {
                 $('.partial').html(res)
-            },
-            error: function () {
-                alert("error")
-            }
-        })
+                notifyBar('Added successfully', 'success')
+            }, { toggle: false }
+        );
     }
-    $(document).on('click', '#addbtn', addIngredient)
+    $(document).on('click', '#addbtn', addIngredient);
     $(document).on('click', '.show-ing', function () {
-        debugger
-        if ($('.partial .ing').length == 0) 
-            addIngredient()
-    })
+        if ($('.partial .ing').length == 0)
+            addIngredient();
+    });
 </script>

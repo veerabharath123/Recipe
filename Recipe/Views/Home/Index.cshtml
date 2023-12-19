@@ -34,8 +34,8 @@
             @Html.Partial("Pages",Model) 
         </div>
     <script>
+        
         $(document).on('click', 'button.change-view.btn-secondary', function () {
-
             spinner(true)
             $.ajax({
                 url: '@Url.Action("LoadPages","Home")',
@@ -50,12 +50,73 @@
                     $('.change-view').toggleClass('btn-primary btn-secondary')
                     $('.view').html(res)
                     spinner(false)
+                    
                 },
                 error: function (err) {
                     spinner(false)
                     alert(err)
                 }
             })
+        })
+        $(document).on('click', 'button.test', function () {
+            notifyBar('test1', 'danger')
+        })
+        $(document).on('click', '.Favourite', function () {
+            let ele = $(this);
+            let btn = ele.find('i')
+            $.ajax({
+                url: '@Url.Action("ChangeFav","Home")',
+                type: 'POST',
+                data: { id: ele.data('id'), change: btn.hasClass('fa-regular') },
+                success: function (res) {
+                    if (res['success'] == true) {
+                        btn.hasClass('fa-regular') ?
+                            btn.removeClass('fa-regular').addClass('fa-solid c-pink') :
+                            btn.removeClass('fa-solid c-pink').addClass('fa-regular')
+                    }
+                    else {
+                        alert(res['message'])
+                    }
+                },
+                error: function () {
+                    alert("Failed")
+                }
+            })
+        })
+        $(document).on('click', '.pager span:not(.active,.info)', function () {
+            debugger;
+            let btn = $(this).attr('id');
+            let cur = 1;
+            switch (btn) {
+                case 'first':
+                    cur = 1;
+                    break;
+                case 'next':
+                    cur = parseInt($('.pager span.active').text()) + 1;
+                    break;
+                case 'prev':
+                    cur = parseInt($('.pager span.active').text()) - 1;
+                    break;
+                case 'last':
+                    cur = parseInt($('.pager span.info').text().replace('Total: ', ''));
+                    break;
+                default:
+                    cur = parseInt($(this).text());
+                    break;
+            };
+            ajaxPost(
+                '', '@Url.Action("LoadPages","Home")',
+                {
+                    currentPage: cur,
+                    pageSize: 12,
+                    maxPages: 5,
+                    view: $('button.change-view').filter('.btn-primary').data('view')
+                },
+                function (res) {
+                    $('.view').html(res)
+                },
+                { toggle: true }
+            )
         })
     </script>
 </div>

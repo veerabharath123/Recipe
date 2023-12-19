@@ -14,10 +14,9 @@
             <div class="col-6">
                 @Html.TextBox($"Ingredients[{i}].QUANTITY",Model[i].QUANTITY,new {@class="form-control Quantity",@placeholder="Quantity"})
             </div>
-           
+            @Html.Hidden($"Ingredients[{i}].RECIPE_ID",Model[i].RECIPE_ID ,new {@class="recipe_id"})
+            @Html.Hidden($"Ingredients[{i}].ID",Model[i].ID ,new {@class="id"})
         </div>
-        @Html.Hidden($"Ingredients[{i}].RECIPE_ID",Model[i].RECIPE_ID ,new {@class="recipe_id"})
-        @Html.Hidden($"Ingredients[{i}].ID",Model[i].ID ,new {@class="id"})
     }
 </div>
 <div class="modal-footer">

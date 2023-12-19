@@ -6,7 +6,7 @@
     <div class="col-12 h-50 table-view">
         <table class="table table-striped shadow">
             <tr>
-                <th>Actions</th>
+                <th style="text-align:center">Actions</th>
                 <th>Recipe Name</th>
                 <th>No of Ingredients</th>
                 <th>Food Type</th>
@@ -39,7 +39,7 @@
                     <td>@item.TotalIngredients</td>
                     <td>
                         @{
-                            var color = item.ID == 1 ? "green" : "brown";
+                            var color = item.RECIPE_TYPE_ID == 1 ? "green" : "brown";
                         }
                         <div style="aspect-ratio:1/1;width:20px;border:2px solid @color" class="d-center mx-2">
                             <div style="aspect-ratio:1/1;width:10px;background:@color;border-radius:50px;">
@@ -121,63 +121,7 @@ else if (Model.VIEW == "block-view")
             <span class="info deep-shadow">Total: @Model.TotalPages</span>
         </div>
     </div>
+    <button class="test" hidden>test</button>
 <script>
     
-    $(document).on('click', '.Favourite', function () {
-        let ele = $(this);
-        let btn = ele.find('i')
-        $.ajax({
-            url: '@Url.Action("ChangeFav","Home")',
-            type: 'POST',
-            data: { id: ele.data('id'), change: btn.hasClass('fa-regular') },
-            success: function (res) {
-                if (res['success'] == true) {
-                    btn.hasClass('fa-regular') ?
-                        btn.removeClass('fa-regular').addClass('fa-solid c-pink') :
-                        btn.removeClass('fa-solid c-pink').addClass('fa-regular')
-                }
-                else {
-                    alert(res['message'])
-                }
-            },
-            error: function () {
-                alert("Failed")
-            }
-        })
-    })
-    $(document).on('click', '.pager span:not(.active,.info)', function () {
-        debugger;
-        let btn = $(this).attr('id');
-        let cur = 1;
-        switch (btn) {
-            case 'first':
-                cur = 1;
-                break;
-            case 'next':
-                cur = parseInt($('.pager span.active').text()) + 1;
-                break;
-            case 'prev':
-                cur = parseInt($('.pager span.active').text()) - 1;
-                break;
-            case 'last':
-                cur = parseInt($('.pager span.info').text().replace('Total: ',''));
-                break;
-            default:
-                cur = parseInt($(this).text());
-                break;
-        };
-        ajaxPost(
-            '','@Url.Action("LoadPages","Home")',
-            {
-                currentPage: cur,
-                pageSize: 12,
-                maxPages: 5,
-                view: $('button.change-view').filter('.btn-primary').data('view')
-            },
-            function (res) {
-                $('.view').html(res)
-            },
-            { toggle: true }
-        )
-    })
 </script>
