@@ -1,6 +1,8 @@
-﻿@{
+﻿@using Microsoft.Extensions.Configuration;
+@{
     Layout = "_LayoutLogin";
     var sigin = (bool)ViewData["signin"];
+    var config = new ConfigurationManager().GetSection("Encryption");
 }
 <div class="c-box-2 rounded shadow-lg d-center scroll" style="z-index:-2">
     <div class="row deep-shadow rounded" style="height:80%;width:clamp(480px,50%,98%)">
@@ -19,7 +21,14 @@
                     <div class="row">
                         <div class="mb-2 mt-2">
                             <label for="password" class="form-label">Password:</label>
-                            <input type="text" id="pass" name="password" class="form-control"/>
+                            <div class="input-group mb-3">
+                                <input type="password" id="pass" name="password" class="form-control" />
+                                <button class="btn btn-dark" type="button" id="eye">
+                                    <i class="fa-solid fa-eye-slash"></i>
+                                </button>
+                            </div>
+                            
+                            
                         </div>
                     </div>
                     @if (sigin)
@@ -79,8 +88,8 @@
     </div>
 </div>
 <script>
-    var value1 = '!MmU$er@ct0Nline'
-    var value2 = '!MmU$er@ct0Nline'
+    var value1 = '@(config.GetSection("key").Value)'
+    var value2 = '@(config.GetSection("iv").Value)'
     function GetValuesFrom(value1, value2)
     {
         $("#submit").click(function () {
@@ -88,14 +97,18 @@
             var iv = CryptoJS.enc.Utf8.parse(value2);
             var value = $("#pass").val();
             var encryptedlogin = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(value), key,
-              {
-                  keySize: 128 / 8,
-                  iv: iv,
-                  mode: CryptoJS.mode.CBC,
-                  padding: CryptoJS.pad.Pkcs7
-              });
-              $("#pass").val(encryptedlogin)
+                                {
+                                    keySize: 128 / 8,
+                                    iv: iv,
+                                    mode: CryptoJS.mode.CBC,
+                                    padding: CryptoJS.pad.Pkcs7
+                                });
+            $("#pass").val(encryptedlogin)
         });
     }
     GetValuesFrom(value1, value2)
+    $('#eye').on('click', function () {
+        $('#pass').attr('type', $(this).find('i').hasClass('fa-eye-slash') ? 'text' : 'password');
+        $(this).find('i').toggleClass('fa-eye-slash').toggleClass('fa-eye');
+    })
 </script>

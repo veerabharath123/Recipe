@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Recipe.Helpers;
 
 namespace WatchList
 {
@@ -44,7 +45,7 @@ namespace WatchList
             //});
 
             //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.InjectDependencies();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
