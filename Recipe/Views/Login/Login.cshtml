@@ -1,48 +1,51 @@
 ﻿@using Microsoft.Extensions.Configuration;
 @{
     Layout = "_LayoutLogin";
-    var sigin = (bool)ViewData["signin"];
+    var sigin = (bool)(ViewData["signin"]??"false");
     var config = new ConfigurationManager().GetSection("Encryption");
+    var key = config.GetSection("key").Value;
+    var iv = config.GetSection("iv").Value;
 }
 <div class="c-box-2 rounded shadow-lg d-center scroll" style="z-index:-2">
     <div class="row deep-shadow rounded" style="height:80%;width:clamp(480px,50%,98%)">
         <div class="col-lg-6 blur">
             <div class="row w-100" style="position:absolute">
                 <h1 class="mt-3">@(sigin ? "Sign Up" : "Sign In")</h1>
-                <form action="@Url.Action("VerifyUser","Login")" method="POST" id="form1">
-                    <div class="row">
+                <form action="@Url.Action("VerifyUser","Login")" method="POST" id="form2">
+                    <div class="row mt-3">
                         <div class="col-12">
                             <div class="mb-2 mt-2">
-                                <label for="email" class="form-label">Email:</label>
-                                <input type="email" name="email" class="form-control" />
+                                <input id="email" type="text" name="emailOrUsername" class="form-control" placeholder="Email or username" />
+                                <span class="error mt-1" data-error="email"></span>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="mb-2 mt-2">
-                            <label for="password" class="form-label">Password:</label>
-                            <div class="input-group mb-3">
-                                <input type="password" id="pass" name="password" class="form-control" />
-                                <button class="btn btn-dark" type="button" id="eye">
+                            <div class="input-group">
+                                <input type="password" id="pass" name="password" class="form-control" placeholder="password" />
+                                <button class="btn btn-dark eye" type="button" id="eye">
                                     <i class="fa-solid fa-eye-slash"></i>
                                 </button>
                             </div>
-                            
-                            
+                            <span class="error" data-error="pass"></span>
                         </div>
                     </div>
                     @if (sigin)
                     {
                         <div class="row">
-                            <div class="mb-2 mt-2">
-                                <label for="password" class="form-label">Confirm Password:</label>
-                                <input type="text" class="form-control"/>
+                            <div class="input-group mb-3">
+                                <input type="text" class="form-control" placeholder="Confirm Password" />
+                                <button class="btn btn-dark eye" type="button" id="eye">
+                                    <i class="fa-solid fa-eye-slash"></i>
+                                </button>
                             </div>
                         </div>
                     }
                     <div class="row mt-2 mb-2">
                         <div class="col-12">
-                            <button type="submit" class="btn btn-primary" id="submit">Login</button>
+                            <button type="button" class="btn btn-primary" id="submit">Login</button>
+                            <button type="submit" class="btn btn-primary" id="submit1" hidden>Login</button>
                         </div>
                     </div>
                 </form>
@@ -53,9 +56,8 @@
                     <a href="#" class="text-dark"><i class="fa-solid fa-key"></i> forget password </a>
                 </div>
             }
-            
         </div>
-        <div class="col-lg-6 d-none d-lg-inline-block @(sigin ? "bg-primary":"bg-success") " style="position:relative">
+        <div class="col-lg-6 d-none d-lg-inline-block @(sigin ? "bg-primary":"bg-success")" style="position:relative">
             <div class="row mt-3" style="position:absolute">
                 <div clss="col-12 ">
                     <h3 class="text-white mx-4">
@@ -88,27 +90,79 @@
     </div>
 </div>
 <script>
-    var value1 = '@(config.GetSection("key").Value)'
-    var value2 = '@(config.GetSection("iv").Value)'
+    var value1 = '01234567890123456789012345678901'
+    var value2 = '1234567890123456'
     function GetValuesFrom(value1, value2)
     {
-        $("#submit").click(function () {
-            var key = CryptoJS.enc.Utf8.parse(value1);
-            var iv = CryptoJS.enc.Utf8.parse(value2);
+        $("#submit").click(function (e) {
+            // var key = CryptoJS.enc.Utf8.parse(value1);
+            // var iv = CryptoJS.enc.Utf8.parse(value2);
             var value = $("#pass").val();
-            var encryptedlogin = CryptoJS.AES.encrypt(CryptoJS.enc.Utf8.parse(value), key,
-                                {
-                                    keySize: 128 / 8,
-                                    iv: iv,
-                                    mode: CryptoJS.mode.CBC,
-                                    padding: CryptoJS.pad.Pkcs7
-                                });
-            $("#pass").val(encryptedlogin)
+            if(validateForm(this)){
+                debugger;
+
+                // Your encryption key (16 bytes for AES-128, 24 bytes for AES-192, 32 bytes for AES-256)
+                const key = CryptoJS.enc.Utf8.parse(value1);
+
+                // Your initialization vector (16 bytes for AES)
+                const iv = CryptoJS.enc.Utf8.parse(value2);
+
+                // Your plaintext
+                const plaintext = "Hello, world!";
+
+                // Encrypt
+                const ciphertext = CryptoJS.AES.encrypt(value, key, { iv: iv, mode: CryptoJS.mode.CBC, padding: CryptoJS.pad.Pkcs7 });
+                $("#pass").val(ciphertext)
+                $('#submit1').click();
+            }
+            else{
+                e.preventDefault();
+            }
         });
     }
     GetValuesFrom(value1, value2)
-    $('#eye').on('click', function () {
-        $('#pass').attr('type', $(this).find('i').hasClass('fa-eye-slash') ? 'text' : 'password');
+    $('.eye').on('click', function () {
+        $(this).prev().attr('type', $(this).find('i').hasClass('fa-eye-slash') ? 'text' : 'password');
         $(this).find('i').toggleClass('fa-eye-slash').toggleClass('fa-eye');
     })
+    function validateForm(form){
+        let errs = 0;
+        $(form).find('input').each((i, e) => {
+            if ($(e).val() == '') {
+                $('span[data-error="' + $(e).attr('id') + '"]').text('This field is required');
+                $(e).addClass('error-input')
+                errs++;
+            }
+            else {
+                $(e).removeClass('error-input')
+                $('span[data-error="' + $(e).attr('id') + '"]').text('');
+            }
+        });
+        return errs == 0;
+    }
+    function validate(){
+        let err = 0
+        let email = $('#email')
+        let pass = $('#pass')
+        if (!checkEmail(email.val())) {
+            email.next('span.error').text('Invalid email');
+            email.addClass('error-input')
+            err++
+        }
+        else {
+            email.removeClass('error-input')
+            email.next('span.error').text('');
+        }
+        if (!checkPassword()) {
+            pass.next('span.error').text('Invalid password');
+            pass.addClass('error-input')
+            err++
+        }
+        else {
+            pass.removeClass('error-input')
+            pass.next('span.error').text('');
+        }
+        return err == 0;
+    }
+    checkEmail()
 </script>

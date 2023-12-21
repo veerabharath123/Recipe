@@ -311,3 +311,13 @@ body {
     color: whitesmoke;
     border: 3px solid #970b18;
 }
+.error{
+    color:red
+}
+.error-input {
+    border: 2px solid red !important;
+    
+}
+    .error-input:focus {
+        box-shadow: 0px 0px 8px 4px #ff000082;
+    }

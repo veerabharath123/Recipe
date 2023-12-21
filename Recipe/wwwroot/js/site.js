@@ -78,3 +78,10 @@ function notifyBar(message, type, callback = null, delay = 5000) {
         duration: delay
     }, callback)
 }
+function checkEmail(value) {
+    var pattern = /(?:((?:[\w-]+(?:\.[\w-]+)*)@(?:(?:[\w-]+\.)*\w[\w-]{0,66})\.(?:[a-z]{2,6}(?:\.[a-z]{2})?));*)/g;
+    return pattern.test(value);
+}
+function checkPassword(value) {
+    return value.length >= 8;
+}
