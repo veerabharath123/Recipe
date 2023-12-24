@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims;
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -71,7 +72,7 @@
                                 <i class="fa-solid fa-circle-user"></i>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><h5 class="dropdown-header">User 1</h5></li>
+                                <li><h5 class="dropdown-header">&#64@(User.FindFirst(ClaimTypes.Name)?.Value)</h5></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="@Url.Action("LogOut","Login")"><i class="fa-solid fa-right-from-bracket"></i> Logout </a></li>
                             </ul>

@@ -1,5 +1,5 @@
 ﻿@using Recipe.Helpers;
-@model PagerResponse<RecipeDetails>
+@model PagerResponse<RecipeDetailResponse>
 @{
     ViewData["Title"] = ViewData["section"];
 }
@@ -20,10 +20,10 @@
             </div>
             <div class="col-6 d-end">
                 <div class="btn-group change-view-buttons shadow">
-                <button class="btn @(Model.VIEW == "table-view" ? "btn-primary":"btn-secondary") change-view" data-view="table-view" title="List view">
+                <button class="btn @(Model.View == "table-view" ? "btn-primary":"btn-secondary") change-view" data-view="table-view" title="List view">
                         <i class="fa fa-list"></i>
                     </button>
-                <button class="btn @(Model.VIEW == "block-view" ? "btn-primary":"btn-secondary") change-view" data-view="block-view" title="Grid view">
+                <button class="btn @(Model.View == "block-view" ? "btn-primary":"btn-secondary") change-view" data-view="block-view" title="Grid view">
                         <i class="fa fa-grip"></i>
                     </button>
                 </div>
@@ -37,20 +37,20 @@
         
         $(document).on('click', 'button.change-view.btn-secondary', function () {
             spinner(true)
+            let pager = {
+                currentPage: $('.pager span.active').text(),
+                pageSize: 12,
+                maxPages: 5,
+                view: $(this).data('view')
+            }
             $.ajax({
                 url: '@Url.Action("LoadPages","Home")',
                 type: 'POST',
-                data: {
-                    currentPage: $('.pager span.active').text(),
-                    pageSize: 12,
-                    maxPages: 5,
-                    view: $(this).data('view')
-                },
+                data: { pager: pager },
                 success: function (res) {
                     $('.change-view').toggleClass('btn-primary btn-secondary')
                     $('.view').html(res)
                     spinner(false)
-                    
                 },
                 error: function (err) {
                     spinner(false)
@@ -74,17 +74,12 @@
                             btn.removeClass('fa-regular').addClass('fa-solid c-pink') :
                             btn.removeClass('fa-solid c-pink').addClass('fa-regular')
                     }
-                    else {
-                        alert(res['message'])
-                    }
+                    else alert(res['message'])
                 },
-                error: function () {
-                    alert("Failed")
-                }
+                error: () => alert("Failed")
             })
         })
         $(document).on('click', '.pager span:not(.active,.info)', function () {
-            debugger;
             let btn = $(this).attr('id');
             let cur = 1;
             switch (btn) {
@@ -104,14 +99,14 @@
                     cur = parseInt($(this).text());
                     break;
             };
+            let pager = {
+                currentPage: cur,
+                pageSize: 12,
+                maxPages: 5,
+                view: $('button.change-view').filter('.btn-primary').data('view')
+            }
             ajaxPost(
-                '', '@Url.Action("LoadPages","Home")',
-                {
-                    currentPage: cur,
-                    pageSize: 12,
-                    maxPages: 5,
-                    view: $('button.change-view').filter('.btn-primary').data('view')
-                },
+                '', '@Url.Action("LoadPages","Home")', { pager: pager },
                 function (res) {
                     $('.view').html(res)
                 },

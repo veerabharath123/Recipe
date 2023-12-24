@@ -7,6 +7,7 @@ namespace Recipe.Helpers
         public static void InjectDependencies(this IServiceCollection services)
         {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IRequest, Request>();
             //services.AddSingleton<IAppSettings, AppSettings>(e => Configuration.GetSection(nameof(AppSettings)).Get<AppSettings>());
         }
     }

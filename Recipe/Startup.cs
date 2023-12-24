@@ -44,7 +44,9 @@ namespace WatchList
             //    options.MinimumSameSitePolicy = SameSiteMode.None;
             //});
 
-            //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(
+                x => x.LoginPath = "/Login/LoginPage"    
+            );
             services.InjectDependencies();
         }
 
@@ -65,16 +67,16 @@ namespace WatchList
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
             app.UseSession();
             //app.UseCookiePolicy();
-            app.UseAuthentication();
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Login}/{action=Login}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

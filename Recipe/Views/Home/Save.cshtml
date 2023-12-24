@@ -1,71 +1,89 @@
-﻿@model RecipeDetails
+﻿@model RecipeDetailResponse
 @{
-    ViewData["Title"] = $"{(Model.ID > 0 ? "Edit" : "Add")} recipe";
+    ViewData["Title"] = $"{(Model.id > 0 ? "Edit" : "Add")} recipe";
     var foodtypes = new List<RecipeType>();
     foodtypes.Add(new RecipeType{RECIPETYPE_NAME="Veg",ID = 1});
     foodtypes.Add(new RecipeType{RECIPETYPE_NAME="Non-Veg",ID = 2});
 }
-<div class="c-box rounded shadow-lg " style="z-index:-2">
-        <h3 class="mt-3">
-            <a class="no-decor" href="@Url.Action("Index","Home")">
-                <i class="fas fa-arrow-left text-dark"></i>
-            </a> @($"{(Model.ID > 0 ? "Edit" : "Add")} recipe")
-        </h3>
-        <hr />
-        <div class="row mt-5 mb-3">
-            <div class="col-12 d-start">
-                <button type="button" class="btn btn-primary show-ing" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                    Show Ingredients
-                </button>
+<div class="c-box rounded shadow-lg p-4" style="z-index:-2">
+    <h3 class="mt-3">
+        <a class="no-decor" href="@Url.Action("Index","Home")">
+            <i class="fas fa-arrow-left text-dark"></i>
+        </a> @($"{(Model.id > 0 ? "Edit" : "Add")} recipe")
+    </h3>
+    <hr />
+    <form method="POST" id="form1">
+        <div class="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="background:#ffffff45">
+                    <div class="modal-body " style="aspect-ratio:4/3;position:relative;">
+                        @if (Model.image_id != null && !string.IsNullOrEmpty(Model.image))
+                        {
+                            <img class="rounded" id="img-pic " src="@("data:image/jpeg;base64,"+Model.image)" style="width:100%;height:100%" />
+                        }
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="row mb-5">
-            <div class="col-lg-4 d-center blur">
-                <div style="" class="d-center border pic rounded o-x-h">
-                    <div class="img-edit-bg r-center">
-                        <button class="btn btn-info" id="upload">
-                            <i class="fa fa-edit"></i>
-                        </button>
-                    </div>
-                    @if(Model.ID > 0 && !string.IsNullOrEmpty(Model.Image))
-                    {
-                        <img id="img-pic " src="@("data:image/jpeg;base64,"+Model.Image)" style="width:100%;height:100%" />
-                    }
-                    else
-                    {
-                        <img id="img-pic" src="https://i.pinimg.com/474x/59/5f/a5/595fa5ffb3d67f62ceabaa0d9a40d1e2.jpg" style="width:100%;height:100%" />
-                    }
-                    <input type="file" id="browse" hidden/>
+        <div class="row mb-5" >
+            <div class="col-lg-4">
+                <div class="row p-3 justify-content-center">
+                    <div class="col-md-6 col-lg-12 d-center pic rounded o-x-h blur shadow">
+                        @* <div class="img-edit-bg r-center rounded">
+                            
+                        </div> *@
+                        @if(Model.image_id != null && !string.IsNullOrEmpty(Model.image))
+                        {
+                            <img class="rounded" id="img-pic " src="@("data:image/jpeg;base64,"+Model.image)" style="height:80%;aspect-ratio: 4/3;" />
+                        }
+                        else
+                        {
+                            <img class="rounded" id="img-pic" src="https://i.pinimg.com/474x/59/5f/a5/595fa5ffb3d67f62ceabaa0d9a40d1e2.jpg" style="height:80%;aspect-ratio: 4/3;" />
+                        }
+                        <input type="file" id="browse" hidden/>
                     
+                    </div>
+                    <div class="col-12 mt-3 d-center">
+                       <div class="btn-group rounded">
+                            <button class="btn btn-info" id="upload" type="button">
+                                <i class="fa fa-edit"></i>
+                            </button>
+                            @if (Model.image_id != null)
+                            {
+                                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                                    <i class="fa fa-eye"></i>
+                                </button>
+                            }
+                            
+                       </div>
+                    </div>
                 </div>
             </div>
             <div class="col-lg-8 ">
-                <form  method="POST" id="form1">
-                    <div class="row">
-                        <div class="col-12">
-                            @Html.HiddenFor(x => x.IMAGE_ID,new {@class="form-control",@id="temp_id"})
-                            @Html.HiddenFor(x => x.ID,new {@class="form-control"})
+                    <div class="row p-3">
+                    <div class="col-12 blur shadow rounded">
+                            @Html.HiddenFor(x => x.image_id,new {@class="form-control",@id="temp_id"})
+                            @Html.HiddenFor(x => x.id,new {@class="form-control"})
                             <div class="row">
-                                <div class="col-lg-6">
+                                <div class="col-md-6">
                                     <div class="mb-3 mt-3">
                                         <label for="email" class="form-label">Recipe Name:</label>
-                                        @Html.TextBoxFor(x => x.RECIPE_NAME,new {@class="form-control"})
+                                        @Html.TextBoxFor(x => x.recipe_name,new {@class="form-control"})
                                     </div>
                                 </div>
-                                <div class="col-lg-6">
+                                <div class="col-md-6">
                                     <div class="mb-3 mt-3 ">
                                         <label class="form-check-label" for="radio1">Food type:</label>
                                         <div class="form-control d-start mt-2 blur" style="background:transparent">
-                                            @foreach(var item in foodtypes)
+                                            @foreach (var item in foodtypes)
                                             {
-                                                var color = item.ID == 1 ? "green":"brown";
+                                                var color = item.ID == 1 ? "green" : "brown";
                                                 <div class="col-lg-6 d-center">
                                                     <div class="form-check d-center">
-                                                        <input type="radio" name="RECIPE_TYPE_ID" value="@item.ID" class="form-check-input" @(item.ID == Model.RECIPE_TYPE_ID ? "checked":"")/>
+                                                        <input type="radio" name="RECIPE_TYPE_ID" value="@item.ID" class="form-check-input" @(item.ID == Model.recipe_type_id ? "checked" : "") />
                                                     </div>
-                                                    <div style="aspect-ratio:1/1;width:20px;border:2px solid @color" class="d-center mx-2" >
+                                                    <div style="aspect-ratio:1/1;width:20px;border:2px solid @color" class="d-center mx-2">
                                                         <div style="aspect-ratio:1/1;width:10px;background:@color;border-radius:50px;">
-
                                                         </div>
                                                     </div>
                                                     <span>@item.RECIPETYPE_NAME</span>
@@ -75,37 +93,40 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <label for="pwd" class="form-label">Steps:</label>
-                                @Html.TextAreaFor(x => x.DESCRIPTION,new {@class="form-control",@rows="5"})
-                            </div>
-                            <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                                    <div class="modal-content partial blur " >
-                                        @Html.Partial("IngredientPartial", Model.Ingredients)
+                            <div class="row mb-2">
+                                <div class="col-md-6">
+                                    <div class="partial">
+                                        @Html.Partial("IngredientPartial", Model.ingredients)
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="pwd" class="form-label">Instructions:</label>
+                                        @Html.TextAreaFor(x => x.description,new {@class="form-control",@rows="10",@id="txta"})
                                     </div>
                                 </div>
                             </div>
+                            <div class="mb-3">
+                                <button type="button" class="btn btn-primary " id="submit">Submit</button>
+                                @if (Model.id > 0)
+                                {
+                                    <button data-id="@Model.id" class="btn btn-danger" type="button" id="delrecipe">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                }
+                            </div>
                         </div>
                     </div>
-                    <div class="row mb-2">
-                        <div class="col-12">
-                        <button type="button" class="btn btn-primary " id="submit">Submit</button>
-                            @if(Model.ID > 0)
-                            {
-                                <button data-id="@Model.ID" class="btn btn-danger" type="button" id="delrecipe">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            }
-                        </div>
-                    </div>
-                </form>
             </div>
         </div>
-    </div>
+    </form>
+</div>
     
 
 <script>
+    $('#txta').on('mouseup',function(){
+        console.log(1)
+    })
     function validateForm() {
         return {errors:0,message:''}
     }
@@ -153,7 +174,7 @@
     $(document).on('click', '#delbtn', function () {
         if ($('.partial .ing').length > 1) {
             let ingId = $('.partial .ing:last').find('input.id').val();
-            if (['', '0'].indexOf(ingId) > -1) delIng(ingId);
+            if (['', '0'].indexOf(ingId) == -1) delIng(ingId);
             else $('.partial .ing:last').remove();
         }
         if ($('.partial .ing').length == 1) $(this).remove();
@@ -187,13 +208,13 @@
         let data = [];
         $('.ing').each((i, e) =>
             data.push({
-                INGREDIENT_NAME: $(e).find('input.Name').val(),
-                QUANTITY: $(e).find('input.Quantity').val(),
-                RECIPE_ID: $(e).find('input.recipe_id').val(),
-                ID: $(e).find('input.id').val(),
+                ingredient_name: $(e).find('input.Name').val(),
+                quantity: $(e).find('input.Quantity').val(),
+                recipe_id: $(e).find('input.recipe_id').val(),
+                id: $(e).find('input.id').val(),
             })
         );
-        data.push({ INGREDIENT_NAME: '', QUANTITY: '', RECIPE_ID: 0, ID: 0, });
+        data.push({ ingredient_name: '', quantity: '', recipe_id: 0, id: 0, });
         ajaxPost(
             '', '@Url.Action("LoadIngredients","Home")', { data: JSON.stringify(data) },
             function (res) {

@@ -21,6 +21,6 @@ namespace Recipe.Helpers
         public int StartIndex { get; set; }
         public int EndIndex { get; set; }
         public IEnumerable<T> Pages { get; set; }
-        public string? VIEW { get; set; }
+        public string? View { get; set; }
     }
 }

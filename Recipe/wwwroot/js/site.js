@@ -52,7 +52,6 @@ var animate = {
     fade: {
         animate:'animate-fade'}}
 function notify(options, callback = null) {
-    debugger;
     let n = $('.notify-bar-bg .notify-bar').length;
     $('.notify-bar-bg').append(
         '<div class=" alert-bg-' + options['type'] + ' notify-bar mx-2" id="notify-bar'+(n+1)+'">'+options['message']+'</div>'

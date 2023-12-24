@@ -5,57 +5,72 @@ using Recipe.Helpers;
 using Recipe.Models;
 using System.Net.NetworkInformation;
 using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
+using Recipe.Dtos.RequestDto;
+using System.Security.Claims;
 
 namespace Recipe.Controllers
 {
+    [Authorize]
     public class HomeController : Controller
     {
-        private readonly Request _request;
+        private readonly IRequest _request;
 
-        public HomeController(IConfiguration config)
+        public HomeController(IConfiguration config, IRequest request)
         {
-            _request = new Request(config);
+            _request = request;
+        }
+        private IActionResult ClearSession()
+        {
+            return RedirectToAction("LogOut", "Login");
+        }
+        private bool VerifySession()
+        {
+            var user = JsonConvert.DeserializeObject<UserResponse>(HttpContext?.Session.GetString("UserDetails")??"null");
+            return user == null;
         }
         [ResponseCache(NoStore = true)]
         public async Task<IActionResult> Index()
         {
+            if (VerifySession()) return ClearSession();
             ViewData["section"] = "Index";
-            var request = new PagerRequest();
+            var request = new DecimalPageRequest();
+            request.id = Convert.ToDecimal(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             var session = HttpContext.Session.GetString("PagerRequest");
-            if(session != null) request = JsonConvert.DeserializeObject<PagerRequest>(session);
-            var data = await _request.ApiCallPost<PagerResponse<RecipeDetails>>("Food", "GetRecipeList", request);
-            if (data.Result != null) data.Result.VIEW = request.view;
+            if(session != null) request = JsonConvert.DeserializeObject<DecimalPageRequest>(session);
+            var data = await _request.ApiCallPost<PagerResponse<RecipeDetailResponse>>("Food", "GetRecipeList", request,true);
+            if (data.Result != null) data.Result.View = request?.pager.view;
             return View(data.Result);
         }
-        public async Task<IActionResult> Details(decimal? id)
+        public async Task<IActionResult> Details(decimal id=0)
         {
-            var result = new RecipeDetails();
-            if (id != null)
+            var result = new RecipeDetailResponse();
+            if (id > 0)
             {
-                var response = await _request.ApiCallPost<RecipeDetails>("Food", "GetRecipeById", new KeyValue { value = id });
+                var response = await _request.ApiCallPost<RecipeDetailResponse>("Food", "GetRecipeById", new DecimalRequest { id = id },true);
                 result = response.Result;
             }
             return View("Save",result);
         }
-        public async Task<IActionResult> SaveRecipe(RecipeDetails request)
+        public async Task<IActionResult> SaveRecipe(RecipeDetailResponse request)
         {
             if (ModelState.IsValid)
             {
-                var data = await _request.ApiCallPost<bool>("Food", "SaveRecipe", request);
+                var data = await _request.ApiCallPost<bool>("Food", "SaveRecipe", request,true);
                 return Json(data);
             }
             return Json(new { sucess = false, message = "failed" });
         }
         public IActionResult LoadIngredients(string data)
         {
-            var ing = JsonConvert.DeserializeObject<List<Ingredient>>(data);
+            var ing = JsonConvert.DeserializeObject<List<IngredientResponse>>(data);
             return PartialView("IngredientPartial",ing);
         }
-        public async Task<IActionResult> DeleteRecipe(decimal? id)
+        public async Task<IActionResult> DeleteRecipe(decimal id)
         {
-            if(id != null && id > 0)
+            if(id > 0)
             {
-                var res = await _request.ApiCallPost<bool>("Food", "DeleteRecipeById", new KeyValue { value = id });
+                var res = await _request.ApiCallPost<bool>("Food", "DeleteRecipeById", new DecimalRequest { id = id }, true);
                 return Json(res);
             }
             return Json(new
@@ -64,11 +79,11 @@ namespace Recipe.Controllers
                 Message= "Failed"
             });
         }
-        public async Task<IActionResult> DeleteIngredient(decimal? id)
+        public async Task<IActionResult> DeleteIngredient(decimal id=0)
         {
-            if (id != null && id > 0)
+            if (id > 0)
             {
-                var res = await _request.ApiCallPost<bool>("Food", "DeleteIngredientById", new KeyValue { value = id });
+                var res = await _request.ApiCallPost<bool>("Food", "DeleteIngredientById", new DecimalRequest { id = id },true);
                 return Json(res);
             }
             return Json(new
@@ -77,12 +92,12 @@ namespace Recipe.Controllers
                 Message = "Failed"
             });
         }
-        public async Task<IActionResult> View(decimal? id)
+        public async Task<IActionResult> View(decimal id)
         {
-            var result = new RecipeDetails();
-            if (id != null)
+            var result = new RecipeDetailResponse();
+            if (id > 0)
             {
-                var response = await _request.ApiCallPost<RecipeDetails>("Food", "GetRecipeById", new KeyValue { value = id });
+                var response = await _request.ApiCallPost<RecipeDetailResponse>("Food", "GetRecipeById", new DecimalRequest { id = id }, true);
                 result = response.Result;
             }
             return View("View", result);
@@ -91,29 +106,31 @@ namespace Recipe.Controllers
         {
             if (id != null && change != null)
             {
-                var response = await _request.ApiCallPost<bool>("Food", "ChangeFav", new KeyValue { value = id,key= change.Value ? "Y" : "N" });
+                var response = await _request.ApiCallPost<bool>("Food", "ChangeFav", new KeyValue { value = id,key= change.Value ? "Y" : "N" },true);
                 return Json(response);
             }
             return Json(new {sucess=false,message="failed"});
         }
-        public async Task<IActionResult> Favourites(PagerRequest request)
+        public async Task<IActionResult> Favourites(DecimalPageRequest request)
         {
+            request.id = Convert.ToDecimal(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             ViewData["section"] = "Favourites";
             HttpContext.Session.SetString("PagerRequest", JsonConvert.SerializeObject(request));
-            var response = await _request.ApiCallPost<PagerResponse<RecipeDetails>>("Food", "GetFavourites", new PagerRequest());
-            if (response.Result != null) response.Result.VIEW = request.view;
+            var response = await _request.ApiCallPost<PagerResponse<RecipeDetailResponse>>("Food", "GetFavourites", request??new DecimalPageRequest(), true);
+            if (response.Result != null) response.Result.View = request?.pager.view;
             return View("Index", response.Result);
         }
-        public async Task<IActionResult> SaveImage(ImageDetails imgDetails)
+        public async Task<IActionResult> SaveImage(ImageRequest imgDetails)
         {
-            var response = await _request.ApiCallPost<Guid?>("Documents", "SaveImage", imgDetails);
+            var response = await _request.ApiCallPost<Guid?>("Documents", "SaveImage", imgDetails,true);
             return Json(response);
         }
-        public async Task<IActionResult> LoadPages(PagerRequest request)
+        public async Task<IActionResult> LoadPages(DecimalPageRequest request)
         {
+            request.id = Convert.ToDecimal(User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             HttpContext.Session.SetString("PagerRequest", JsonConvert.SerializeObject(request));
-            var response = await _request.ApiCallPost<PagerResponse<RecipeDetails>>("Food", "GetRecipeList", request);
-            if(response.Result != null) response.Result.VIEW = request.view;
+            var response = await _request.ApiCallPost<PagerResponse<RecipeDetailResponse>>("Food", "GetRecipeList", request ?? new DecimalPageRequest(), true);
+            if(response.Result != null) response.Result.View = request?.pager.view;
             return PartialView("Pages",response.Result);
         }
     }

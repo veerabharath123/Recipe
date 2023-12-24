@@ -1,51 +1,81 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Recipe.Helpers;
 using Recipe.Models;
+using System.Security.Claims;
 
 namespace Recipe.Controllers
 {
     public class LoginController : Controller
     {
-        private readonly Request _request;
+        private readonly IRequest _request;
 
-        public LoginController(IConfiguration config)
+        public LoginController(IConfiguration config,IRequest request)
         {
-            _request = new Request(config);
+            _request = request;
         }
-        public IActionResult Login(bool? signin)
+        [ResponseCache(NoStore = true)]
+        public IActionResult LoginPage()
         {
             var UserLogin = HttpContext.Session.GetString("UserLogin");
             if (Convert.ToBoolean(UserLogin??"false"))
                 return RedirectToAction("Index", "Home");
-            var session = HttpContext.Session.GetString("LoginPage");
-            if (session != null && signin == null) ViewData["signin"] = Convert.ToBoolean(session);
-            else
-            {
-                signin = signin??false;
-                ViewData["signin"] = signin;
-                HttpContext.Session.SetString("LoginPage", Convert.ToString(signin));
-            }
-            return View();
+            return View("Login");
         }
-        [HttpPost]
-        public async Task<IActionResult> VerifyUser(LoginUser login)
+        [ResponseCache(NoStore = true)]
+        public IActionResult SigninPage()
+        {
+            var UserLogin = HttpContext.Session.GetString("UserLogin");
+            if (Convert.ToBoolean(UserLogin ?? "false"))
+                return RedirectToAction("Index", "Home");
+            return View("Signin");
+        }
+        public async Task<IActionResult> CreateAccount(LoginRequest login)
         {
             if (ModelState.IsValid)
             {
-                if(login.emailOrUsername == "abc" || login.password == "Ua5KeKeHOoFoLSysnaM27w==")
+                var data = await _request.ApiCallPost<UserResponse>("Users", "CreateUser", login);
+                if (data.Success && data.Result != null)
                 {
-                    var data = await _request.ApiCallPost<bool>("Users", "Login", login);
-                    HttpContext.Session.SetString("UserLogin", Convert.ToString(true));
+                    await SignIn(data.Result);
                     return RedirectToAction("Index", "Home");
-                }  
+                }
             }
-            HttpContext.Session.SetString("UserLogin", Convert.ToString(false));
-            return RedirectToAction("Login");
+            return RedirectToAction("LoginPage");
         }
-        public IActionResult LogOut()
+        [HttpPost]
+        public async Task<IActionResult> VerifyUser(LoginRequest login)
         {
-            HttpContext.Session.SetString("UserLogin", Convert.ToString(false));
-            return RedirectToAction("Login");
+            if (ModelState.IsValid)
+            {
+                var data = await _request.ApiCallPost<UserResponse>("Users", "Login", login);
+                if (data.Success && data.Result != null)
+                {
+                    await SignIn(data.Result);
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+            return RedirectToAction("LoginPage");
+        }
+        private async Task SignIn(UserResponse user)
+        {
+            HttpContext.Session.SetString("UserLogin", Convert.ToString(true));
+            HttpContext.Session.SetString("UserDetails", JsonConvert.SerializeObject(user));
+            var claims = new List<Claim>() {
+                new Claim(ClaimTypes.NameIdentifier, user.user_id.ToString()),
+                            new Claim(ClaimTypes.Name, user.username),
+                        };
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+        }
+        public async Task<IActionResult> LogOut()
+        {
+            HttpContext.Session.Clear();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("LoginPage");
         }
     }
 }

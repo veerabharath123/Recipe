@@ -1,6 +1,6 @@
 ﻿namespace Recipe.Models
 {
-    public class ImageDetails
+    public class ImageRequest
     {
         public string? Base64 { get; set; }
         public Guid? Temp_Id { get; set; }

@@ -1,39 +1,45 @@
-﻿@model List<Ingredient>
-
-<div class="modal-header">
-    <h5 class="modal-title" id="staticBackdropLabel">Ingredients: @(Model?.Count??0)</h5>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-</div>
-<div class="modal-body">
-    @for (int i = 0; i < (Model?.Count??0); i++)
+﻿@model List<IngredientResponse>
+@{
+    if (!Model.Any())
     {
-        <div class="row ing">
-            <div class="col-6">
-                @Html.TextBox($"Ingredients[{i}].INGREDIENT_NAME",Model[i].INGREDIENT_NAME,new {@class="form-control Name",@placeholder="Name"})
-            </div>
-            <div class="col-6">
-                @Html.TextBox($"Ingredients[{i}].QUANTITY",Model[i].QUANTITY,new {@class="form-control Quantity",@placeholder="Quantity"})
-            </div>
-            @Html.Hidden($"Ingredients[{i}].RECIPE_ID",Model[i].RECIPE_ID ,new {@class="recipe_id"})
-            @Html.Hidden($"Ingredients[{i}].ID",Model[i].ID ,new {@class="id"})
-        </div>
+        Model.Add(new IngredientResponse());
     }
-</div>
-<div class="modal-footer">
-    <div class="row">
-        <div class="col-12 d-flex justify-content-center align-items-center">
-            <div class="btn-group">
-                @if ((Model?.Count??0) > 1)
-                {
-                    <button class="btn btn-danger" type="button" id="delbtn">
-                        <i class="fa-solid fa-trash"></i>
-                    </button>
-                }
-                <button class="btn btn-success" type="button" id="addbtn"><i class="fa-solid fa-plus"></i></button>
-            </div>
+}
+<div class="row">
+    <div class="col-6">
+        <label class="form-label">Ingredients: @(Model?.Count ?? 0)</label>
+    </div>
+    <div class="col-6 d-flex justify-content-end align-items-center">
+        <div class="btn-group border rounded">
             
+            @if ((Model?.Count ?? 0) > 1)
+            {
+                <button class="btn-no" type="button" id="delbtn">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            }
+            <button class="btn-no" type="button" id="addbtn"><i class="fa-solid fa-plus"></i></button>
         </div>
+
     </div>
 </div>
+<div class="row scroll" style="max-height:250px !important;height:fit-content;">
+    <div class="col-12">
+        @for (int i = 0; i < (Model?.Count ?? 0); i++)
+        {
+            <div class="row ing @(i > 0? "mt-2":"")">
+                <div class="col-6">
+                    @Html.TextBox($"Ingredients[{i}].INGREDIENT_NAME",Model[i].ingredient_name,new {@class="form-control Name",@placeholder="Name"})
+                </div>
+                <div class="col-6">
+                    @Html.TextBox($"Ingredients[{i}].QUANTITY",Model[i].quantity,new {@class="form-control Quantity",@placeholder="Quantity"})
+                </div>
+                @Html.Hidden($"Ingredients[{i}].RECIPE_ID",Model[i].recipe_id ,new {@class="recipe_id"})
+                @Html.Hidden($"Ingredients[{i}].ID",Model[i].id ,new {@class="id"})
+            </div>
+        }
+    </div>
+</div>
+
 
 
