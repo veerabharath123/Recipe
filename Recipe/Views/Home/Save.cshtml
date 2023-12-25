@@ -28,7 +28,7 @@
         <div class="row mb-5" >
             <div class="col-lg-4">
                 <div class="row p-3 justify-content-center">
-                    <div class="col-md-6 col-lg-12 d-center pic rounded o-x-h blur shadow">
+                    <div class="col-md-6 col-lg-12 d-center pic rounded o-x-h blur deep-shadow">
                         @* <div class="img-edit-bg r-center rounded">
                             
                         </div> *@
@@ -38,7 +38,7 @@
                         }
                         else
                         {
-                            <img class="rounded" id="img-pic" src="https://i.pinimg.com/474x/59/5f/a5/595fa5ffb3d67f62ceabaa0d9a40d1e2.jpg" style="height:80%;aspect-ratio: 4/3;" />
+                            <img class="rounded" id="img-pic" src="~/images/recipe-logo.png" style="height:80%;aspect-ratio: 4/3;background:#944d59" />
                         }
                         <input type="file" id="browse" hidden/>
                     
@@ -54,14 +54,13 @@
                                     <i class="fa fa-eye"></i>
                                 </button>
                             }
-                            
                        </div>
                     </div>
                 </div>
             </div>
             <div class="col-lg-8 ">
                     <div class="row p-3">
-                    <div class="col-12 blur shadow rounded">
+                    <div class="col-12 blur deep-shadow rounded">
                             @Html.HiddenFor(x => x.image_id,new {@class="form-control",@id="temp_id"})
                             @Html.HiddenFor(x => x.id,new {@class="form-control"})
                             <div class="row">

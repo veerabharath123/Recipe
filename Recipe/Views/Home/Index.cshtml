@@ -113,6 +113,33 @@
                 { toggle: true }
             )
         })
+        $(document).on('click','.view-eye',function(){
+            ajaxPost(
+                '', '@Url.Action("View","Home")', { id:$(this).data('id')},
+                function (res) {
+                    $('.view-body').html(res)
+                    $('#view-open').click();
+                },
+                { toggle: true }
+            )
+        })
     </script>
 </div>
 
+<button type="button" id="view-open" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal" hidden>
+  Open modal
+</button>
+
+<!-- The Modal -->
+<div class="modal" id="myModal">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content bg-recipe">
+
+      <!-- Modal body -->
+      <div class="modal-body view-body d-center" style="padding:0">
+        Modal body..
+      </div>
+
+    </div>
+  </div>
+</div>

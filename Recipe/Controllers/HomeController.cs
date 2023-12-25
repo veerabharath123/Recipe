@@ -11,7 +11,7 @@ using System.Security.Claims;
 
 namespace Recipe.Controllers
 {
-    [Authorize]
+    //[Authorize]
     public class HomeController : Controller
     {
         private readonly IRequest _request;
@@ -100,7 +100,7 @@ namespace Recipe.Controllers
                 var response = await _request.ApiCallPost<RecipeDetailResponse>("Food", "GetRecipeById", new DecimalRequest { id = id }, true);
                 result = response.Result;
             }
-            return View("View", result);
+            return PartialView("View", result);
         }
         public async Task<IActionResult> ChangeFav(decimal? id,bool? change)
         {
@@ -132,6 +132,11 @@ namespace Recipe.Controllers
             var response = await _request.ApiCallPost<PagerResponse<RecipeDetailResponse>>("Food", "GetRecipeList", request ?? new DecimalPageRequest(), true);
             if(response.Result != null) response.Result.View = request?.pager.view;
             return PartialView("Pages",response.Result);
+        }
+        public IActionResult GeneratePdf()
+        {
+            var pdf = new PdfGenerator();
+            return File(pdf.Generate(), "application/pdf");
         }
     }
 }

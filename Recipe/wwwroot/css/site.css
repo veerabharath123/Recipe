@@ -330,3 +330,9 @@ body {
     outline: none;
     border: none;
 }
+.bg-recipe {
+    position: absolute;
+    background: url('https://dbdzm869oupei.cloudfront.net/img/mantels/preview/22280.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
