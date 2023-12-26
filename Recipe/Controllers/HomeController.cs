@@ -15,10 +15,12 @@ namespace Recipe.Controllers
     public class HomeController : Controller
     {
         private readonly IRequest _request;
+        private readonly IRazorViewToStringRenderer _pdf;
 
-        public HomeController(IConfiguration config, IRequest request)
+        public HomeController(IConfiguration config, IRequest request, IRazorViewToStringRenderer pdf)
         {
             _request = request;
+            _pdf = pdf;
         }
         private IActionResult ClearSession()
         {
@@ -133,10 +135,11 @@ namespace Recipe.Controllers
             if(response.Result != null) response.Result.View = request?.pager.view;
             return PartialView("Pages",response.Result);
         }
-        public IActionResult GeneratePdf()
+        public async Task<IActionResult> GeneratePdf(decimal id)
         {
-            var pdf = new PdfGenerator();
-            return File(pdf.Generate(), "application/pdf");
+            var response = await _request.ApiCallPost<RecipeDetailResponse>("Food", "GetRecipeById", new DecimalRequest { id = id }, true);
+            var file = await _pdf.GeneratePdfFile("View.cshtml", response.Result,response.Result?.recipe_name!);
+            return File(file.filedata, System.Net.Mime.MediaTypeNames.Application.Pdf,file.filename);
         }
     }
 }

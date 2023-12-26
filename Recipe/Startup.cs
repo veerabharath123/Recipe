@@ -29,6 +29,7 @@ namespace WatchList
         {
             services.AddMvc();
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
+            services.AddRazorPages();
             services.AddDistributedMemoryCache();
 
             services.AddSession(options =>
