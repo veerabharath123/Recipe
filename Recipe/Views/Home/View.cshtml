@@ -14,25 +14,34 @@
         <hr />
         <div class="row  mb-3 ">
             <div class="col-lg-3 mt-3 ">
-                <div class="row p-3">
-                    <div class="d-center col-12 pic rounded o-x-h blur rounded deep-shadow">
-                        @if(Model.id > 0 && !string.IsNullOrEmpty(Model.image))
-                        {
-                            <img id="img-pic " src="@("data:image/jpeg;base64,"+Model.image)" style="width:80%;height:80%" />
-                        }
-                        else
-                        {
-                            <img id="img-pic" src="~/images/recipe-logo.png" style="width:80%;height:80%;background:#944d59" />
-                        }
+                <div class="row p-3 h-100">
+                <div class="col-md-6 col-lg-12 d-center blur deep-shadow rounded">
+                    <div class="row">
+                        <div class="col-12 d-center pic rounded o-x-h  ">
+                            <div class="rounded recipe-img o-h">
+                                @if (Model.image_id != null && !string.IsNullOrEmpty(Model.image))
+                                {
+                                    <img id="img-pic " src="@("data:image/jpeg;base64,"+Model.image)" data-bs-toggle="modal" data-bs-target="#staticBackdrop" />
+                                }
+                                else
+                                {
+                                    <img id="img-pic" src="~/images/recipe-logo.png" data-bs-toggle="modal" data-bs-target="#staticBackdrop" />
+                                }
+                            </div>
+
+                        </div>
+                        <div class="col-12 mt-3 mb-3 d-center">
+                            <div class="btn-group rounded deep-shadow">
+                                <button class="btn btn-success" type="button">
+                                    <i class="fa fa-file-pdf"></i>
+                                </button>
+                                <a href="@Url.Action("Details","Home",new {id=Model.id})" class="btn btn-warning" title="Edit">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-12 d-center mt-2">
-                        <button class="btn btn-primary m-2 deep-shadow">
-                            <i class="fa-solid fa-print"></i> Print
-                        </button>
-                        <a href="@Url.Action("GeneratePdf","Home")" class="btn btn-success deep-shadow">
-                            <i class="fa-solid fa-file-pdf"></i>
-                        </a>
-                    </div>
+                </div>
                 </div>
             </div>
             <div class="col-lg-9 mt-3">
@@ -78,12 +87,14 @@
                                         <tr>
                                             <th>Name</th>
                                             <th>Quantity</th>
+                                            <th>Opt.</th>
                                         </tr>
                                         @foreach (var item in Model.ingredients)
                                         {
                                             <tr>
                                                 <td>@item.ingredient_name</td>
                                                 <td>@item.quantity</td>
+                                                <td>@(item.optional_flag == "Y" ? "Yes" : "No")</td>
                                             </tr>
                                         }
                                         </tbody>

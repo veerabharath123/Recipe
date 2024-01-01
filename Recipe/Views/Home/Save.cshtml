@@ -16,10 +16,14 @@
         <div class="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content" style="background:#ffffff45">
-                    <div class="modal-body " style="aspect-ratio:4/3;position:relative;">
+                    <div class="modal-body" style="aspect-ratio:4/3;position:relative;">
                         @if (Model.image_id != null && !string.IsNullOrEmpty(Model.image))
                         {
-                            <img class="rounded" id="img-pic " src="@("data:image/jpeg;base64,"+Model.image)" style="width:100%;height:100%" />
+                            <img class="rounded w-100 h-100 r-img" id="img-pic " src="@("data:image/jpeg;base64,"+Model.image)"/>
+                        }
+                        else
+                        {
+                            <img id="img-pic" class="w-100 h-100 r-img" src="~/images/recipe-logo.png" />
                         }
                     </div>
                 </div>
@@ -27,34 +31,31 @@
         </div>
         <div class="row mb-5" >
             <div class="col-lg-4">
-                <div class="row p-3 justify-content-center">
-                    <div class="col-md-6 col-lg-12 d-center pic rounded o-x-h blur deep-shadow">
-                        @* <div class="img-edit-bg r-center rounded">
-                            
-                        </div> *@
-                        @if(Model.image_id != null && !string.IsNullOrEmpty(Model.image))
-                        {
-                            <img class="rounded" id="img-pic " src="@("data:image/jpeg;base64,"+Model.image)" style="height:80%;aspect-ratio: 4/3;" />
-                        }
-                        else
-                        {
-                            <img class="rounded" id="img-pic" src="~/images/recipe-logo.png" style="height:80%;aspect-ratio: 4/3;background:#944d59" />
-                        }
-                        <input type="file" id="browse" hidden/>
-                    
-                    </div>
-                    <div class="col-12 mt-3 d-center">
-                       <div class="btn-group rounded">
-                            <button class="btn btn-info" id="upload" type="button">
-                                <i class="fa fa-edit"></i>
-                            </button>
-                            @if (Model.image_id != null)
-                            {
-                                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-                                    <i class="fa fa-eye"></i>
-                                </button>
-                            }
-                       </div>
+                <div class="row p-3 h-100 justify-content-center">
+                    <div class="col-md-6 col-lg-12 d-center blur deep-shadow rounded">
+                        <div class="row">
+                            <div class="col-12 d-center pic rounded o-x-h  ">
+                                <div class="rounded recipe-img o-h">
+                                    @if (Model.image_id != null && !string.IsNullOrEmpty(Model.image))
+                                    {
+                                        <img id="img-pic " class="r-img" src="@("data:image/jpeg;base64,"+Model.image)" data-bs-toggle="modal" data-bs-target="#staticBackdrop" />
+                                    }
+                                    else
+                                    {
+                                        <img id="img-pic" class="r-img" src="~/images/recipe-logo.png" data-bs-toggle="modal" data-bs-target="#staticBackdrop" />
+                                    }
+                                </div>
+                                <input type="file" id="browse" hidden />
+
+                            </div>
+                            <div class="col-12 mt-3 mb-3 d-center">
+                                <div class="btn-group rounded">
+                                    <button class="btn btn-info" id="upload" type="button">
+                                        <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -93,15 +94,16 @@
                                 </div>
                             </div>
                             <div class="row mb-2">
-                                <div class="col-md-6">
-                                    <div class="partial">
-                                        @Html.Partial("IngredientPartial", Model.ingredients)
-                                    </div>
-                                </div>
+                                
                                 <div class="col-md-6">
                                     <div class="mb-3">
                                         <label for="pwd" class="form-label">Instructions:</label>
                                         @Html.TextAreaFor(x => x.description,new {@class="form-control",@rows="10",@id="txta"})
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="partial">
+                                        @Html.Partial("IngredientPartial", Model.ingredients)
                                     </div>
                                 </div>
                             </div>
@@ -156,7 +158,7 @@
                 { Base64: reader.result?.replace('data:' + file.type + ';base64,', ''), Temp_Id: $('#temp_id').val(), Image_Name: file.name, Image_Type: file.type },
                 function (res) {
                     if (res['success']) {
-                        $('#img-pic').attr('src', URL.createObjectURL(file));
+                        $('.r-img').attr('src', URL.createObjectURL(file));
                         $('#img-pic-h').val(reader.result?.replace('data:' + file.type + ';base64,', ''));
                         $('#temp_id').val(res['result']);
                         notifyBar(res['message'], 'success');
@@ -171,12 +173,14 @@
         };
     });
     $(document).on('click', '#delbtn', function () {
+        let len = $('.partial .ing').length == 1
         if ($('.partial .ing').length > 1) {
             let ingId = $('.partial .ing:last').find('input.id').val();
             if (['', '0'].indexOf(ingId) == -1) delIng(ingId);
             else $('.partial .ing:last').remove();
         }
         if ($('.partial .ing').length == 1) $(this).remove();
+        $('.partial #ing-count').text('Ingredients: '+$('.partial .ing').length)
     });
     function delIng(id = 0) {
         ajaxPost(
@@ -211,6 +215,7 @@
                 quantity: $(e).find('input.Quantity').val(),
                 recipe_id: $(e).find('input.recipe_id').val(),
                 id: $(e).find('input.id').val(),
+                optional_flag: $(e).find('input.optional').val()
             })
         );
         data.push({ ingredient_name: '', quantity: '', recipe_id: 0, id: 0, });
@@ -218,7 +223,6 @@
             '', '@Url.Action("LoadIngredients","Home")', { data: JSON.stringify(data) },
             function (res) {
                 $('.partial').html(res)
-                notifyBar('Added successfully', 'success')
             }, { toggle: false }
         );
     }

@@ -6,37 +6,15 @@
     <div class="col-12 h-50 table-view">
         <table class="table table-striped shadow">
             <tr>
-                <th style="text-align:center">Actions</th>
                 <th>Recipe Name</th>
                 <th>No of Ingredients</th>
                 <th>Food Type</th>
+                <th class="th-actions"></th>
             </tr>
 
             @foreach (var item in Model.Pages)
             {
                 <tr>
-
-                    <td class="options">
-                        <a class="no-decor view-eye" data-id="@item.id">
-                                <i class="fa-solid fa-eye text-primary"></i>
-                            </a>
-                        <a href="@Url.Action("View","Home",new {id=item.id})" class="" title="View" hidden>
-                            <i class="fa-solid fa-eye"></i>
-                        </a>
-                        <a href="@Url.Action("Details","Home",new {id=item.id})" class="text-warning" title="Edit">
-                            <i class="fa fa-edit"></i>
-                        </a>
-                        <span data-id="@item.id" class="Favourite" title="Favourite">
-                            @if (item.favourites == "Y")
-                            {
-                                <i class="fa-solid c-pink fa-heart"></i>
-                            }
-                            else
-                            {
-                                <i class="fa-regular fa-heart"></i>
-                            }
-                        </span>
-                    </td>
                     <td>@item.recipe_name</td>
                     <td>@item.totalingredients</td>
                     <td>
@@ -48,7 +26,33 @@
                             </div>
                         </div>
                     </td>
+                    <td class="td-hover d-end">
+                        <span><i class="fa-solid fa-ellipsis-vertical"></i></span>
+                        <div class="opt-td">
+                            <a class="no-decor view-eye" data-id="@item.id">
+                                <i class="fa-solid fa-eye text-primary"></i>
+                            </a>
+                            <a href="@Url.Action("View","Home",new {id=item.id})" class="" title="View" hidden>
+                                <i class="fa-solid fa-eye"></i>
+                            </a>
+                            <a href="@Url.Action("Details","Home",new {id=item.id})" class="text-warning" title="Edit">
+                                <i class="fa fa-edit"></i>
+                            </a>
+                            <span data-id="@item.id" class="Favourite" title="Favourite">
+                                @if (item.favourites == "Y")
+                                {
+                                    <i class="fa-solid c-pink fa-heart"></i>
+                                }
+                                else
+                                {
+                                    <i class="fa-regular fa-heart"></i>
+                                }
+                            </span>
+                        </div>
+                    </td>
                 </tr>
+
+                
             }
         </table>
     </div>
@@ -74,26 +78,15 @@ else if (Model.View == "block-view")
                                 <i class="fa-solid fa-utensils text-white" style="font-size: 100px;"></i>
                             </div>*@
                         }
-                        <div class="img-bg d-around">
-                            <a class="no-decor" href="@Url.Action("Details","Home",new {id=item.id})">
-                                <i class="fa-solid fa-edit text-light"></i>
-                            </a>
-                            <button class="btn-no view-eye" data-id="@item.id">
-                                <i class="fa-solid fa-eye text-light"></i>
-                            </button>
-                            <a class="no-decor" href="@Url.Action("View","Home",new {id=item.id})" hidden>
-                                <i class="fa-solid fa-eye text-light"></i>
-                            </a>
-
-                        </div>
-                        <div class="img-h img-content ">
-                            <div class="d-flex m-2">
-                                <div class="col-10 o-x-h ">
-                                    <a class="no-decor text-white" href="@Url.Action("View","Home",new {id=item.id})">
-                                        @item.recipe_name
+                        <div class="img-bg d-start">
+                            <div class="row px-2 w-100">
+                                <div class="col-6 d-start">
+                                    <a class="no-decor" href="@Url.Action("Details","Home",new {id=item.id})">
+                                        <i class="fa-solid fa-edit text-light"></i>
                                     </a>
-                                </div>
-                                <div class="col-2">
+                                    <button class="btn-no view-eye" data-id="@item.id">
+                                        <i class="fa-solid fa-eye text-light"></i>
+                                    </button>
                                     <span data-id="@item.id" class="Favourite" title="Favourite">
                                         @if (item.favourites == "Y")
                                         {
@@ -104,6 +97,24 @@ else if (Model.View == "block-view")
                                             <i class="fa-regular fa-heart"></i>
                                         }
                                     </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="img-h img-content ">
+                            <div class="d-flex m-2">
+                                <div class="col-10 o-x-h ">
+                                    <a class="no-decor text-white" href="@Url.Action("View","Home",new {id=item.id})">
+                                        @item.recipe_name
+                                    </a>
+                                </div>
+                                <div class="col-2 d-end">
+                                    @{
+                                        var color = item.recipe_type_id == 1 ? "green" : "brown";
+                                    }
+                                    <div style="aspect-ratio:1/1;width:20px;border:2px solid @color" class="d-center mx-2 shadow">
+                                        <div style="aspect-ratio:1/1;width:10px;background:@color;border-radius:50px;">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 

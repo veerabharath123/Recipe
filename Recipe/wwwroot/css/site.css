@@ -118,22 +118,27 @@ body {
     aspect-ratio:4/3;
     position:relative;
     overflow:hidden;
-} .img-content {
+}
+.img-content {
     position: absolute;
     width: 100%;
     bottom: 0;
-    background: #000000a6;
-} .img-bg {
+    background: linear-gradient(to bottom, transparent,#00000069,#000000c7);
+}
+.img-bg {
     position: absolute;
     width: 100%;
-    height: 50%;
-    background: #000000a6;
-    transform: translateY(-100%);
-    transition: all 1s;
+    height: 50px;
+    background: linear-gradient(to bottom, #000000b0, transparent);
+    transform:translateY(-100%);
+    opacity: 0;
 } .o-x-h{
     overflow-x:hidden
-} .img-block:hover > .img-bg{
+}
+.img-block:hover > .img-bg {
+    opacity: 1;
     transform: translateY(0%);
+    transition: opacity .6s,transform .4s;
 }
 .img-edit-bg {
     
@@ -326,9 +331,9 @@ body {
     }
 
 .btn-no {
-    background: none;
-    outline: none;
-    border: none;
+    background:none;
+    border:none;
+    outline:none;
 }
 .bg-recipe {
     position: absolute;
@@ -336,3 +341,63 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
 }
+.recipe-img {
+    height: 80%;
+    aspect-ratio: 4/3;
+    cursor: pointer;
+    background: #944d59;
+    border: 3px solid #693e00;
+}
+    .recipe-img> img {
+        transition: transform .5s;
+        width:100%;
+        height:100%;
+    }
+    .recipe-img:hover > img {
+        transform: scale(1.2)
+    }
+.o-h{
+    overflow:hidden;
+}
+.form-control, .input-group-text {
+    border: 2px solid #693e00 !important;
+    background: transparent !important;
+}
+.input-group > *:not(:first-child) {
+    border-left: none !important;
+}
+.btn-group.cust {
+    border: 2px solid #693e00 !important;
+    background: transparent !important;
+}
+    .btn-group.cust > button:hover {
+        box-shadow: 0px 0px 8px 4px #534c455e;
+        color: whitesmoke;
+    }
+    .btn-group.cust > button:active {
+        box-shadow: 0px 0px 8px 4px #534c455e inset;
+        color: whitesmoke;
+    }   
+:not(.no-cust):is(.form-control, .input-group-text):focus {
+    border: 2px solid #693e00 !important;
+    background: transparent !important;
+}
+.td-hover{
+    display:flex;
+}
+    .td-hover:hover > .opt-td{
+        width: 100px;
+    }
+.opt-td {
+    width: 0px;
+    transition: width .5s;
+    overflow-x: hidden;
+    display: flex;
+    justify-content: space-around;
+    box-shadow: 0px 0px 8px 4px #855510 inset;
+    border-radius: 10px;
+    margin-left: 5px;
+}
+    .opt-td > a, button, .Favourite {
+        cursor: pointer;
+    }
